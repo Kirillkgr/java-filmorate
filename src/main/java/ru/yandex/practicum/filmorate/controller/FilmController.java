@@ -25,6 +25,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 public class FilmController {
 	final Map<Integer, Film> filmCollection;
 	Integer id;
+
 	FilmController() {
 		filmCollection = new HashMap<>();
 		id = 0;
