@@ -5,16 +5,17 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.Service.DurationDeserializer;
@@ -28,6 +29,7 @@ import ru.yandex.practicum.filmorate.Service.DurationDeserializer;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 public class Film {
 	private static final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
@@ -40,7 +42,6 @@ public class Film {
 	String name;
 	@NotNull
 	@Size(min = 1, max = 200)
-	@Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s]+$")
 	@EqualsAndHashCode.Exclude
 	String description;
 	@NotNull
