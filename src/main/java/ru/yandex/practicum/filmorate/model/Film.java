@@ -53,7 +53,7 @@ public class Film {
 	@EqualsAndHashCode.Exclude
 	@JsonDeserialize(using = DurationDeserializer.class)
 	Duration duration;
-	
+
 	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
 	public boolean isValidReleaseDate() {
 		return !releaseDate.isBefore(LocalDate.of(1895, 12, 28));

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 
 public class DurationDeserializer extends JsonDeserializer<Duration> {
+
 	@Override
 	public Duration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 		int durationInSeconds = jsonParser.getIntValue();
