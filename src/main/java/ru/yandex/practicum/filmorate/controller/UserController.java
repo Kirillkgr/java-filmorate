@@ -13,12 +13,12 @@ public class UserController {
 	public String getUsers() {
 		return "users";
 	}
-	
+
 	@PutMapping
 	public String updateUser() {
 		return "users";
 	}
-	
+
 	@PostMapping
 	public String createUser() {
 		return "users";
