@@ -30,6 +30,7 @@ public class FilmController {
 		filmCollection = new HashMap<>();
 		id = 0;
 	}
+
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<Film> getFilms(@PathVariable Integer id) {
 		if (filmCollection.containsKey(id)) {
@@ -39,6 +40,7 @@ public class FilmController {
 		log.info("Не найден фильм : {}", id);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
+
 	@PutMapping
 	public ResponseEntity<Boolean> updateFilm(@RequestBody Film updateFilm) {
 		if (filmCollection.containsKey(updateFilm.getId())) {
@@ -49,12 +51,15 @@ public class FilmController {
 			log.info("Не найден фильм: {}", updateFilm.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(false);
 	}
+
 	@PostMapping
 	public ResponseEntity<Boolean> createFilm(@Validated @RequestBody Film newFilm) {
+		
 		if (filmCollection.containsKey(newFilm.getId()) || newFilm.getId() == 0) {
 			log.info("Фильм с id {} уже существует  или  id = 0 : {}", newFilm.getId(), newFilm.getName());
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
 		}
+
 		newFilm.setId(getNewId());
 		filmCollection.put(newFilm.getId(), newFilm);
 		log.info("Добавлен фильм: {}", newFilm);
