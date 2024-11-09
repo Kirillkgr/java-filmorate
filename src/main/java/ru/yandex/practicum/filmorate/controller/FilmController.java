@@ -67,7 +67,15 @@ public class FilmController {
 	}
 
 	@PostMapping
-	public ResponseEntity<FilmDTO> createFilm(@Validated @RequestBody FilmDTO newFilm) {
+	public ResponseEntity<?> createFilm(@Validated @RequestBody FilmDTO newFilm) {
+		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
+
+		// Проверка минимально допустимой даты выпуска
+		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Дата выпуска фильма не может быть ранее 28 декабря 1895 года.");
+		}
+
 		if (newFilm.getId() == null) {
 			newFilm.setId(getNewId());
 		} else {
@@ -85,7 +93,6 @@ public class FilmController {
 		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
 		log.info("Добавлен фильм: {}", newFilm);
 
-		// Возвращаем `duration` в минутах
 		FilmDTO response = new FilmDTO(newFilmToSave.getId(),
 				newFilmToSave.getName(),
 				newFilmToSave.getDescription(),
@@ -94,6 +101,7 @@ public class FilmController {
 
 		return ResponseEntity.ok(response);
 	}
+
 
 	Integer getNewId() {
 		if (id == null) id = 1;

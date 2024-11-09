@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class FilmControllerTest {
 
 	@Test
 	void getFilms_withFilms_returnsFilms() {
-		FilmDTO testFilm = FilmDTO.builder().id(1).name("Test Film").build();
+		FilmDTO testFilm = FilmDTO.builder().id(1).name("Test Film").releaseDate(LocalDate.now()).build();
 		filmController.createFilm(testFilm);
 
 		ResponseEntity<List<Film>> response = filmController.getFilms();
@@ -43,7 +44,7 @@ class FilmControllerTest {
 
 	@Test
 	void getFilm_existingFilm_returnsFilm() {
-		FilmDTO testFilm = FilmDTO.builder().name("Test Film").description("test description").build();
+		FilmDTO testFilm = FilmDTO.builder().name("Test Film").description("test description").releaseDate(LocalDate.now()).build();
 
 
 		filmController.createFilm(testFilm);
@@ -63,10 +64,10 @@ class FilmControllerTest {
 
 	@Test
 	void updateFilm_existingFilm_updatesFilm() {
-		FilmDTO testFilm = FilmDTO.builder().id(1).name("Test Film").build();
+		FilmDTO testFilm = FilmDTO.builder().id(1).name("Test Film").releaseDate(LocalDate.now()).build();
 		filmController.createFilm(testFilm);
 
-		Film updatedFilm = Film.builder().id(1).name("Updated Film").build();
+		Film updatedFilm = Film.builder().id(1).name("Updated Film").releaseDate(LocalDate.now()).build();
 		ResponseEntity<Film> response = filmController.updateFilm(updatedFilm);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -89,8 +90,8 @@ class FilmControllerTest {
 
 	@Test
 	void createFilm_newFilm_createsFilm() {
-		FilmDTO newFilm = FilmDTO.builder().name("New Film").build();
-		ResponseEntity<FilmDTO> response = filmController.createFilm(newFilm);
+		FilmDTO newFilm = FilmDTO.builder().name("New Film").releaseDate(LocalDate.now()).build();
+		ResponseEntity<FilmDTO> response = (ResponseEntity<FilmDTO>) filmController.createFilm(newFilm);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
