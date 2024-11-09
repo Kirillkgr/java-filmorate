@@ -33,9 +33,7 @@ import ru.yandex.practicum.filmorate.Service.DurationDeserializer;
 @Validated
 public class Film {
 	private static final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
-	@NotNull
-	@NotBlank
-	@EqualsAndHashCode.Exclude
+
 	Integer id;
 	@NotNull
 	@NotBlank

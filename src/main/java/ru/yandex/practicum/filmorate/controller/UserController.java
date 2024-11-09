@@ -26,12 +26,12 @@ import ru.yandex.practicum.filmorate.model.User;
 public class UserController {
 	final Map<Integer, User> usersCollection;
 	Integer id;
-
+	
 	public UserController() {
 		usersCollection = new HashMap<>();
 		id = 0;
 	}
-
+	
 	@GetMapping()
 	public ResponseEntity<List<User>> getUsers() {
 		if (!usersCollection.isEmpty()) {
@@ -41,7 +41,7 @@ public class UserController {
 		log.info("В базе отсутствуют фильмы");
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
-
+	
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<User> getUser(@Validated @PathVariable Integer id) {
 		if (usersCollection.containsKey(id)) {
@@ -51,7 +51,7 @@ public class UserController {
 		log.info("Не найден пользователь : {}", id);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
-
+	
 	@PutMapping
 	public ResponseEntity<Boolean> updateUser(@Validated @RequestBody User updateUser) {
 		if (usersCollection.containsKey(updateUser.getId())) {
@@ -61,19 +61,22 @@ public class UserController {
 		} else log.info("Не найден пользователь: {}", updateUser.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(false);
 	}
-
+	
 	@PostMapping
 	public ResponseEntity<Boolean> createUser(@Validated @RequestBody User newUser) {
-		if (usersCollection.containsKey(newUser.getId()) || newUser.getId() == 0) {
-			log.info("Фильм с id {} уже существует  или  id = 0 : {}", newUser.getId(), newUser.getName());
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
+		User userExist;
+		if (newUser.getId() != null) {
+			userExist = usersCollection.get(newUser.getId());
+			if (userExist != null) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
+			}
 		}
 		newUser.setId(getNewId());
 		usersCollection.put(newUser.getId(), newUser);
 		log.info("Добавлен фильм: {}", newUser);
 		return ResponseEntity.ok(true);
 	}
-
+	
 	Integer getNewId() {
 		return id++;
 	}

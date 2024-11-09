@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
 @Getter
@@ -24,8 +25,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class User {
 
-	@NotNull
-	@NotEmpty
 	Integer id;
 
 	@NotNull
@@ -40,6 +39,8 @@ public class User {
 	String name;
 
 	@NotNull
+	@Past
 	@EqualsAndHashCode.Exclude
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	LocalDate birthday;
 }

@@ -68,7 +68,7 @@ public class FilmController {
 	@PostMapping
 	public ResponseEntity<Boolean> createFilm(@Validated @RequestBody Film newFilm) {
 
-		if (filmCollection.containsKey(newFilm.getId()) || newFilm.getId() == 0) {
+		if (filmCollection.containsKey(newFilm.getId()) ||newFilm.getId() != null) {
 			log.warn("Фильм с id {} уже существует  или  id = 0 : {}", newFilm.getId(), newFilm.getName());
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
 		}
