@@ -23,7 +23,6 @@ public class FilmControllerTest {
 	public void setUp() {
 		filmController = new FilmController();
 		testFilm = Film.builder()
-				.id(1)
 				.name("Test Film")
 				.description("Test Description")
 				.releaseDate(LocalDate.of(2000, 1, 1))
