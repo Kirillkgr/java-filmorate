@@ -83,9 +83,8 @@ class FilmControllerTest {
 		Film nonExistingFilm = Film.builder().id(2).name("Non-Existing Film").build();
 		ResponseEntity<Film> response = filmController.updateFilm(nonExistingFilm);
 
-		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals(nonExistingFilm.getName(), response.getBody().getName());
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertNull(response.getBody());
 	}
 
 	@Test

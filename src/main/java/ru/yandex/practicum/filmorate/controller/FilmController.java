@@ -62,19 +62,19 @@ public class FilmController {
 			filmCollection.put(updateFilm.getId(), updateFilm);
 			log.info("Обновлен фильм: {}", updateFilm.getName());
 			return ResponseEntity.ok(updateFilm);
-		} else log.warn("Не найден фильм: {}", updateFilm.getName());
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updateFilm);
+		} else {
+			log.warn("Не найден фильм: {}", updateFilm.getName());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
 	}
+
 
 	@PostMapping
 	public ResponseEntity<?> createFilm(@Validated @RequestBody FilmDTO newFilm) {
 		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
 
-		// Проверка минимально допустимой даты выпуска
 		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
-			return ResponseEntity.status(500)
-//					.body("Дата выпуска фильма не может быть ранее 28 декабря 1895 года.");
-					.body(null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Дата выпуска фильма не может быть ранее 28 декабря 1895 года.");
 		}
 
 		if (newFilm.getId() == null) {
@@ -83,22 +83,12 @@ public class FilmController {
 			newFilm.setId(getNewId());
 		}
 
-		Film newFilmToSave = Film.builder()
-				.id(newFilm.getId())
-				.name(newFilm.getName() != null ? newFilm.getName() : "")
-				.description(newFilm.getDescription() != null ? newFilm.getDescription() : "")
-				.releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now())
-				.duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0))
-				.build();
+		Film newFilmToSave = Film.builder().id(newFilm.getId()).name(newFilm.getName() != null ? newFilm.getName() : "").description(newFilm.getDescription() != null ? newFilm.getDescription() : "").releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now()).duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0)).build();
 
 		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
 		log.info("Добавлен фильм: {}", newFilm);
 
-		FilmDTO response = new FilmDTO(newFilmToSave.getId(),
-				newFilmToSave.getName(),
-				newFilmToSave.getDescription(),
-				newFilmToSave.getReleaseDate(),
-				(int) newFilmToSave.getDuration().toMinutes());
+		FilmDTO response = new FilmDTO(newFilmToSave.getId(), newFilmToSave.getName(), newFilmToSave.getDescription(), newFilmToSave.getReleaseDate(), (int) newFilmToSave.getDuration().toMinutes());
 
 		return ResponseEntity.ok(response);
 	}
