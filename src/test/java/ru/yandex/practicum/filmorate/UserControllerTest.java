@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -36,12 +37,12 @@ class UserControllerTest {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(1, response.getBody().size());
-		assertEquals(testUser.getName(), response.getBody().get(0).getName());
+		assertEquals(testUser.getName(), response.getBody().getFirst().getName());
 	}
 
 	@Test
 	void getUser_existingUser_returnsUser() {
-		User testUser = User.builder().id(1).name("Test User").email("test@example.com").build();
+		User testUser = User.builder().name("Test User").email("test@example.com").build();
 		userController.createUser(testUser);
 
 		ResponseEntity<User> response = userController.getUser(1);
@@ -59,7 +60,7 @@ class UserControllerTest {
 
 	@Test
 	void updateUser_existingUser_updatesUser() {
-		User testUser = User.builder().id(1).name("Test User").email("test@example.com").build();
+		User testUser = User.builder().name("Test User").email("test@example.com").build();
 		userController.createUser(testUser);
 
 		User updatedUser = User.builder().id(1).name("Updated User").email("updated@example.com").build();
@@ -70,7 +71,7 @@ class UserControllerTest {
 		assertEquals("Updated User", response.getBody().getName());
 
 		ResponseEntity<User> getUserResponse = userController.getUser(1);
-		assertEquals("Updated User", getUserResponse.getBody().getName());
+		assertEquals("Updated User", Objects.requireNonNull(getUserResponse.getBody()).getName());
 	}
 
 	@Test
@@ -95,13 +96,13 @@ class UserControllerTest {
 
 	@Test
 	void createUser_duplicateId_conflict() {
-		User firstUser = User.builder().id(1).name("First User").email("first@example.com").build();
+		User firstUser = User.builder().name("First User").email("first@example.com").build();
 		userController.createUser(firstUser);
 
 		User duplicateUser = User.builder().id(1).name("First User").email("duplicate@example.com").build();
 		ResponseEntity<User> response = userController.createUser(duplicateUser);
 
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-		assertEquals(firstUser.getName(), response.getBody().getName());
+		assertEquals(firstUser.getName(), Objects.requireNonNull(response.getBody()).getName());
 	}
 }
