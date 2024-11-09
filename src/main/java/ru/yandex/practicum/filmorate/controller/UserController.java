@@ -53,13 +53,13 @@ public class UserController {
 	}
 
 	@PutMapping
-	public ResponseEntity<Boolean> updateUser(@Validated @RequestBody User updateUser) {
+	public ResponseEntity<User> updateUser(@Validated @RequestBody User updateUser) {
 		if (usersCollection.containsKey(updateUser.getId())) {
 			usersCollection.put(updateUser.getId(), updateUser);
 			log.info("Обновлен пользователь: {}", updateUser.getName());
-			return ResponseEntity.ok(true);
+			return ResponseEntity.ok(updateUser);
 		} else log.info("Не найден пользователь: {}", updateUser.getName());
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(false);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updateUser);
 	}
 
 	@PostMapping
