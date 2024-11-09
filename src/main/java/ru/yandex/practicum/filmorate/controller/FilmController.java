@@ -62,8 +62,7 @@ public class FilmController {
 			filmCollection.put(updateFilm.getId(), updateFilm);
 			log.info("Обновлен фильм: {}", updateFilm.getName());
 			return ResponseEntity.ok(updateFilm);
-		} else
-			log.warn("Не найден фильм: {}", updateFilm.getName());
+		} else log.warn("Не найден фильм: {}", updateFilm.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updateFilm);
 	}
 
@@ -71,13 +70,8 @@ public class FilmController {
 	public ResponseEntity<Film> createFilm(@Validated @RequestBody FilmDTO newFilm) {
 		if (newFilm.getId() == null) {
 			newFilm.setId(getNewId());
-		} else
-			newFilm.setId(getNewId());
-		Film newFilmToSave = Film.builder().id(newFilm.getId())
-				.name(newFilm.getName() != null ? newFilm.getName() : "")
-				.description(newFilm.getDescription() != null ? newFilm.getDescription() : "")
-				.releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now())
-				.duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0)).build();
+		} else newFilm.setId(getNewId());
+		Film newFilmToSave = Film.builder().id(newFilm.getId()).name(newFilm.getName() != null ? newFilm.getName() : "").description(newFilm.getDescription() != null ? newFilm.getDescription() : "").releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now()).duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0)).build();
 
 		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
 		log.info("Добавлен фильм: {}", newFilm);
@@ -85,8 +79,7 @@ public class FilmController {
 	}
 
 	Integer getNewId() {
-		if (id == null)
-			id = 1;
+		if (id == null) id = 1;
 		return id++;
 	}
 }

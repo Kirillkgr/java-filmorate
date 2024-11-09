@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -50,7 +48,6 @@ public class Film {
 	LocalDate releaseDate;
 	@NotNull
 	@EqualsAndHashCode.Exclude
-//	@JsonDeserialize(using = DurationDeserializer.class)
 	Duration duration;
 
 	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
