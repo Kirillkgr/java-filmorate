@@ -35,7 +35,6 @@ public class User {
 	@NotNull
 	String login;
 
-	@NotBlank(message = "Name cannot be empty")
 	String name;
 
 	@NotNull
