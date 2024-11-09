@@ -71,9 +71,9 @@ public class UserController {
 			}
 		}
 		if (newUser.getId() != null && newUser.getId() > 0) {
+			newUser.setId(newUser.getId());
+		} else
 			newUser.setId(getNewId());
-		}
-		newUser.setId(getNewId());
 		usersCollection.put(newUser.getId(), newUser);
 		log.info("Добавлен фильм: {}", newUser);
 		return ResponseEntity.ok(newUser);
@@ -81,7 +81,7 @@ public class UserController {
 
 	Integer getNewId() {
 		if (id == null)
-			id = 1;
+			id = 0;
 		return id++;
 	}
 }

@@ -42,7 +42,7 @@ class UserControllerTest {
 
 	@Test
 	void getUser_existingUser_returnsUser() {
-		User testUser = User.builder().name("Test User").email("test@example.com").build();
+		User testUser = User.builder().id(1).name("Test User").email("test@example.com").build();
 		userController.createUser(testUser);
 
 		ResponseEntity<User> response = userController.getUser(1);
@@ -60,7 +60,7 @@ class UserControllerTest {
 
 	@Test
 	void updateUser_existingUser_updatesUser() {
-		User testUser = User.builder().name("Test User").email("test@example.com").build();
+		User testUser = User.builder().id(1).name("Test User").email("test@example.com").build();
 		userController.createUser(testUser);
 
 		User updatedUser = User.builder().id(1).name("Updated User").email("updated@example.com").build();
@@ -96,7 +96,7 @@ class UserControllerTest {
 
 	@Test
 	void createUser_duplicateId_conflict() {
-		User firstUser = User.builder().name("First User").email("first@example.com").build();
+		User firstUser = User.builder().id(1).name("First User").email("first@example.com").build();
 		userController.createUser(firstUser);
 
 		User duplicateUser = User.builder().id(1).name("First User").email("duplicate@example.com").build();

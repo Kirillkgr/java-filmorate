@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
-import ru.yandex.practicum.filmorate.Service.DurationDeserializer;
+//import ru.yandex.practicum.filmorate.Service.DurationDeserializer;
 
 /**
  * Film.
@@ -49,7 +50,7 @@ public class Film {
 	LocalDate releaseDate;
 	@NotNull
 	@EqualsAndHashCode.Exclude
-	@JsonDeserialize(using = DurationDeserializer.class)
+//	@JsonDeserialize(using = DurationDeserializer.class)
 	Duration duration;
 
 	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
