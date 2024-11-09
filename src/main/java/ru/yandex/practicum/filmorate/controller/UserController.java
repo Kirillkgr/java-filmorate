@@ -29,7 +29,6 @@ public class UserController {
 
 	public UserController() {
 		usersCollection = new HashMap<>();
-		id = 0;
 	}
 
 	@GetMapping()
@@ -81,6 +80,8 @@ public class UserController {
 	}
 
 	Integer getNewId() {
+		if (id == null)
+			id = 1;
 		return id++;
 	}
 }
