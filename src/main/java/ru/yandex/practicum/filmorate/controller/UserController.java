@@ -66,17 +66,19 @@ public class UserController {
 
 	@PostMapping
 	public ResponseEntity<User> createUser(@Validated @RequestBody User newUser) {
-		// Проверяем, не существует ли пользователь с таким ID
-		if (newUser.getId() != null && usersCollection.containsKey(newUser.getId())) {
-			log.warn("Пользователь с id {} уже существует", newUser.getId());
+		// Устанавливаем имя пользователя по умолчанию, если оно не указано
+		if (newUser.getName() == null || newUser.getName().isBlank()) {
+			newUser.setName(newUser.getLogin());
+		}
+
+		// Проверяем, существует ли пользователь с таким ID
+		User userExist = newUser.getId() != null ? usersCollection.get(newUser.getId()) : null;
+		if (userExist != null) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(newUser);
 		}
 
-		// Генерация нового ID, если он не был передан или равен нулю
-		if (newUser.getId() == null || newUser.getId() <= 0) {
-			newUser.setId(getNewId());
-		}
-
+		// Назначаем ID, если он не задан, и добавляем пользователя в коллекцию
+		newUser.setId(getNewId());
 		usersCollection.put(newUser.getId(), newUser);
 		log.info("Добавлен пользователь: {}", newUser);
 		return ResponseEntity.ok(newUser);
