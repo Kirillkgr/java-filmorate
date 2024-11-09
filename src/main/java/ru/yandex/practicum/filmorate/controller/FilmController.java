@@ -67,15 +67,32 @@ public class FilmController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Film> createFilm(@Validated @RequestBody FilmDTO newFilm) {
+	public ResponseEntity<FilmDTO> createFilm(@Validated @RequestBody FilmDTO newFilm) {
 		if (newFilm.getId() == null) {
 			newFilm.setId(getNewId());
-		} else newFilm.setId(getNewId());
-		Film newFilmToSave = Film.builder().id(newFilm.getId()).name(newFilm.getName() != null ? newFilm.getName() : "").description(newFilm.getDescription() != null ? newFilm.getDescription() : "").releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now()).duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0)).build();
+		} else {
+			newFilm.setId(getNewId());
+		}
+
+		Film newFilmToSave = Film.builder()
+				.id(newFilm.getId())
+				.name(newFilm.getName() != null ? newFilm.getName() : "")
+				.description(newFilm.getDescription() != null ? newFilm.getDescription() : "")
+				.releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now())
+				.duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0))
+				.build();
 
 		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
 		log.info("Добавлен фильм: {}", newFilm);
-		return ResponseEntity.ok(newFilmToSave);
+
+		// Возвращаем `duration` в минутах
+		FilmDTO response = new FilmDTO(newFilmToSave.getId(),
+				newFilmToSave.getName(),
+				newFilmToSave.getDescription(),
+				newFilmToSave.getReleaseDate(),
+				(int) newFilmToSave.getDuration().toMinutes());
+
+		return ResponseEntity.ok(response);
 	}
 
 	Integer getNewId() {

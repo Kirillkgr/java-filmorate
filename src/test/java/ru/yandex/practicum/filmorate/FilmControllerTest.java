@@ -46,7 +46,6 @@ class FilmControllerTest {
 		FilmDTO testFilm = FilmDTO.builder().name("Test Film").description("test description").build();
 
 
-
 		filmController.createFilm(testFilm);
 
 		ResponseEntity<Film> response = filmController.getFilm(1);
@@ -91,7 +90,7 @@ class FilmControllerTest {
 	@Test
 	void createFilm_newFilm_createsFilm() {
 		FilmDTO newFilm = FilmDTO.builder().name("New Film").build();
-		ResponseEntity<Film> response = filmController.createFilm(newFilm);
+		ResponseEntity<FilmDTO> response = filmController.createFilm(newFilm);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
