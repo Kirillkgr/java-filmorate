@@ -1,102 +1,95 @@
 package ru.yandex.practicum.filmorate;
 
-import java.util.Objects;
-import java.time.Duration;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FilmControllerTest {
+class FilmControllerTest {
+
 	private FilmController filmController;
-	private Film testFilm;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		filmController = new FilmController();
-		testFilm = Film.builder()
-				.name("Test Film")
-				.description("Test Description")
-				.releaseDate(LocalDate.of(2000, 1, 1))
-				.duration(Duration.ofMinutes(120))
-				.build();
 	}
 
 	@Test
-	public void testCreateFilm() {
-		ResponseEntity<Boolean> response = filmController.createFilm(testFilm);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(Boolean.TRUE, response.getBody());
-		assertEquals(testFilm, filmController.getFilm(testFilm.getId()).getBody());
+	void getFilms_noFilms_returnsNotFound() {
+		ResponseEntity<List<Film>> response = filmController.getFilms();
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertNull(response.getBody());
 	}
 
 	@Test
-	public void testCreateFilmWithExistingId() {
+	void getFilms_withFilms_returnsFilms() {
+		Film testFilm = Film.builder().id(1).name("Test Film").build();
 		filmController.createFilm(testFilm);
-		ResponseEntity<Boolean> response = filmController.createFilm(testFilm);
-		assertEquals(Boolean.TRUE, response.getBody());
-	}
 
-	@Test
-	public void testGetAllFilms() {
-		filmController.createFilm(testFilm);
 		ResponseEntity<List<Film>> response = filmController.getFilms();
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(1, response.getBody().size());
-		assertTrue(response.getBody().contains(testFilm));
+		assertEquals(testFilm.getName(), response.getBody().get(0).getName());
 	}
 
 	@Test
-	public void testGetAllFilmsWhenEmpty() {
-		ResponseEntity<List<Film>> response = filmController.getFilms();
+	void getFilm_existingFilm_returnsFilm() {
+		Film testFilm = Film.builder().name("Test Film").build();
+		filmController.createFilm(testFilm);
+
+		ResponseEntity<Film> response = filmController.getFilm(1);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		assertEquals(testFilm.getName(), response.getBody().getName());
+	}
+
+	@Test
+	void getFilm_nonExistingFilm_returnsNotFound() {
+		ResponseEntity<Film> response = filmController.getFilm(1);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
 	}
 
 	@Test
-	public void testGetFilm() {
+	void updateFilm_existingFilm_updatesFilm() {
+		Film testFilm = Film.builder().id(1).name("Test Film").build();
 		filmController.createFilm(testFilm);
-		ResponseEntity<Film> response = filmController.getFilm(testFilm.getId());
+
+		Film updatedFilm = Film.builder().id(1).name("Updated Film").build();
+		ResponseEntity<Film> response = filmController.updateFilm(updatedFilm);
+
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(testFilm, response.getBody());
+		assertNotNull(response.getBody());
+		assertEquals("Updated Film", response.getBody().getName());
+
+		ResponseEntity<Film> getFilmResponse = filmController.getFilm(1);
+		assertEquals("Updated Film", getFilmResponse.getBody().getName());
 	}
 
 	@Test
-	public void testGetFilmNotFound() {
-		ResponseEntity<Film> response = filmController.getFilm(999);
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertNull(response.getBody());
-	}
+	void updateFilm_nonExistingFilm_returnsNoContent() {
+		Film nonExistingFilm = Film.builder().id(2).name("Non-Existing Film").build();
+		ResponseEntity<Film> response = filmController.updateFilm(nonExistingFilm);
 
-	@Test
-	public void testUpdateFilm() {
-		filmController.createFilm(testFilm);
-		testFilm.setDescription("Updated Description");
-		ResponseEntity<Boolean> response = filmController.updateFilm(testFilm);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(Boolean.TRUE, response.getBody());
-		assertEquals("Updated Description", Objects.requireNonNull(filmController.getFilm(testFilm.getId()).getBody()).getDescription());
-	}
-
-	@Test
-	public void testUpdateFilmNotFound() {
-		Film newFilm = Film.builder()
-				.id(2)
-				.name("Nonexistent Film")
-				.description("Description")
-				.releaseDate(LocalDate.of(2010, 5, 5))
-				.duration(Duration.ofMinutes(120))
-				.build();
-		ResponseEntity<Boolean> response = filmController.updateFilm(newFilm);
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-		assertNotEquals(Boolean.TRUE, response.getBody());
+		assertNotNull(response.getBody());
+		assertEquals(nonExistingFilm.getName(), response.getBody().getName());
+	}
+
+	@Test
+	void createFilm_newFilm_createsFilm() {
+		Film newFilm = Film.builder().name("New Film").build();
+		ResponseEntity<Film> response = filmController.createFilm(newFilm);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertNotNull(response.getBody());
+		assertEquals("New Film", response.getBody().getName());
 	}
 }

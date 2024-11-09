@@ -71,6 +71,9 @@ public class UserController {
 				return ResponseEntity.status(HttpStatus.CONFLICT).body(newUser);
 			}
 		}
+		if (newUser.getId() != null && newUser.getId() > 0) {
+			newUser.setId(getNewId());
+		}
 		newUser.setId(getNewId());
 		usersCollection.put(newUser.getId(), newUser);
 		log.info("Добавлен фильм: {}", newUser);
