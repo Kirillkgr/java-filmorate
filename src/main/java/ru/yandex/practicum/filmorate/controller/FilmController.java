@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.DTO.FilmDTO;
 import ru.yandex.practicum.filmorate.model.Film;
 
 @Slf4j
@@ -65,14 +68,20 @@ public class FilmController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Film> createFilm(@Validated @RequestBody Film newFilm) {
+	public ResponseEntity<Film> createFilm(@Validated @RequestBody FilmDTO newFilm) {
 		if (newFilm.getId() == null) {
-			newFilm.setId(0);
-		}
-		newFilm.setId(getNewId());
-		filmCollection.put(newFilm.getId(), newFilm);
+			newFilm.setId(getNewId());
+		} else
+			newFilm.setId(getNewId());
+		Film newFilmToSave = Film.builder().id(newFilm.getId())
+				.name(newFilm.getName() != null ? newFilm.getName() : "")
+				.description(newFilm.getDescription() != null ? newFilm.getDescription() : "")
+				.releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now())
+				.duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0)).build();
+
+		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
 		log.info("Добавлен фильм: {}", newFilm);
-		return ResponseEntity.ok(newFilm);
+		return ResponseEntity.ok(newFilmToSave);
 	}
 
 	Integer getNewId() {
