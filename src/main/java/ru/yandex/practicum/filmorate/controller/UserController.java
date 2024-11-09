@@ -63,18 +63,18 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Boolean> createUser(@Validated @RequestBody User newUser) {
+	public ResponseEntity<User> createUser(@Validated @RequestBody User newUser) {
 		User userExist;
 		if (newUser.getId() != null) {
 			userExist = usersCollection.get(newUser.getId());
 			if (userExist != null) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
+				return ResponseEntity.status(HttpStatus.CONFLICT).body(newUser);
 			}
 		}
 		newUser.setId(getNewId());
 		usersCollection.put(newUser.getId(), newUser);
 		log.info("Добавлен фильм: {}", newUser);
-		return ResponseEntity.ok(true);
+		return ResponseEntity.ok(newUser);
 	}
 
 	Integer getNewId() {

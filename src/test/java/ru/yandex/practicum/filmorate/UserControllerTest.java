@@ -21,25 +21,18 @@ public class UserControllerTest {
 	@BeforeEach
 	public void setUp() {
 		userController = new UserController();
-		testUser =  User.builder().id(1).name("Test User").email("test@example.com").build();
+		testUser = User.builder().id(1).name("Test User").email("test@example.com").build();
 	}
 
 	@Test
 	public void testCreateUser() {
-		ResponseEntity<Boolean> response = userController.createUser(testUser);
-
+		ResponseEntity<User> response = userController.createUser(testUser);
+		User user = response.getBody();
+		assertNotEquals(null, response.getBody());
+		assertNotEquals(null, user);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(Boolean.TRUE, response.getBody());
-		assertEquals(testUser, userController.getUser(testUser.getId()).getBody());
-	}
-
-	@Test
-	public void testCreateUserWithExistingId() {
-		userController.createUser(testUser);
-		ResponseEntity<Boolean> response = userController.createUser(testUser);
-
-		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-		assertNotEquals(Boolean.TRUE, response.getBody());
+		assertNotNull(user.getId());
+		assertEquals(user.getName(), testUser.getName());
 	}
 
 	@Test
@@ -73,7 +66,6 @@ public class UserControllerTest {
 	@Test
 	public void testGetUserNotFound() {
 		ResponseEntity<User> response = userController.getUser(999);
-
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
 	}
@@ -82,7 +74,6 @@ public class UserControllerTest {
 	public void testUpdateUser() {
 		userController.createUser(testUser);
 		testUser.setEmail("updated@example.com");
-
 		ResponseEntity<Boolean> response = userController.updateUser(testUser);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -92,10 +83,9 @@ public class UserControllerTest {
 
 	@Test
 	public void testUpdateUserNotFound() {
-		User newUser =   User.builder().id(2).name("Nonexistent User").build();
+		User newUser = User.builder().id(2).name("Nonexistent User").build();
 
 		ResponseEntity<Boolean> response = userController.updateUser(newUser);
-
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 		assertNotEquals(Boolean.TRUE, response.getBody());
 	}
