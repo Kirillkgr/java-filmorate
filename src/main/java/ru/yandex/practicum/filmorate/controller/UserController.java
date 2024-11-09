@@ -57,31 +57,36 @@ public class UserController {
 			usersCollection.put(updateUser.getId(), updateUser);
 			log.info("Обновлен пользователь: {}", updateUser.getName());
 			return ResponseEntity.ok(updateUser);
-		} else log.info("Не найден пользователь: {}", updateUser.getName());
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(updateUser);
+		} else {
+			log.warn("Не найден пользователь с id: {}", updateUser.getId());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updateUser);
+		}
 	}
+
 
 	@PostMapping
 	public ResponseEntity<User> createUser(@Validated @RequestBody User newUser) {
-		User userExist;
-		if (newUser.getId() != null) {
-			userExist = usersCollection.get(newUser.getId());
-			if (userExist != null) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body(newUser);
-			}
+		// Проверяем, не существует ли пользователь с таким ID
+		if (newUser.getId() != null && usersCollection.containsKey(newUser.getId())) {
+			log.warn("Пользователь с id {} уже существует", newUser.getId());
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(newUser);
 		}
-		if (newUser.getId() != null && newUser.getId() > 0) {
-			newUser.setId(newUser.getId());
-		} else
+
+		// Генерация нового ID, если он не был передан или равен нулю
+		if (newUser.getId() == null || newUser.getId() <= 0) {
 			newUser.setId(getNewId());
+		}
+
 		usersCollection.put(newUser.getId(), newUser);
-		log.info("Добавлен фильм: {}", newUser);
+		log.info("Добавлен пользователь: {}", newUser);
 		return ResponseEntity.ok(newUser);
 	}
 
 	Integer getNewId() {
-		if (id == null)
+		if (id == null) {
 			id = 0;
-		return id++;
+		}
+		return ++id;
 	}
+
 }
