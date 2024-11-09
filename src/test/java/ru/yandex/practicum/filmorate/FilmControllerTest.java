@@ -15,10 +15,10 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FilmControllerTest {
-	
+
 	private FilmController filmController;
 	private Film testFilm;
-	
+
 	@BeforeEach
 	public void setUp() {
 		filmController = new FilmController();
@@ -53,7 +53,7 @@ public class FilmControllerTest {
 	public void testGetAllFilms() {
 		filmController.createFilm(testFilm);
 		ResponseEntity<List<Film>> response = filmController.getFilms();
-		
+
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(1, response.getBody().size());
@@ -63,7 +63,7 @@ public class FilmControllerTest {
 	@Test
 	public void testGetAllFilmsWhenEmpty() {
 		ResponseEntity<List<Film>> response = filmController.getFilms();
-		
+
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
 	}
