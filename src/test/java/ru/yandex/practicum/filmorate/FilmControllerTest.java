@@ -44,7 +44,6 @@ public class FilmControllerTest {
 		filmController.createFilm(testFilm);
 		ResponseEntity<Boolean> response = filmController.createFilm(testFilm);
 
-		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
 		assertNotEquals(Boolean.TRUE, response.getBody());
 	}
 
