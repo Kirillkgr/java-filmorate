@@ -72,8 +72,9 @@ public class FilmController {
 
 		// Проверка минимально допустимой даты выпуска
 		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body("Дата выпуска фильма не может быть ранее 28 декабря 1895 года.");
+			return ResponseEntity.status(500)
+//					.body("Дата выпуска фильма не может быть ранее 28 декабря 1895 года.");
+					.body(null);
 		}
 
 		if (newFilm.getId() == null) {
