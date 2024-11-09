@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -26,18 +27,30 @@ public class FilmController {
 	final Map<Integer, Film> filmCollection;
 	Integer id;
 
-	FilmController() {
+	public FilmController() {
 		filmCollection = new HashMap<>();
 		id = 0;
 	}
 
+	@GetMapping
+	public ResponseEntity<List<Film>> getFilms() {
+		if (!filmCollection.isEmpty()) {
+			log.info("Получен список фильмов в количестве : {}", filmCollection.size());
+			return ResponseEntity.ok(filmCollection.values().stream().toList());
+		}
+
+		log.warn("Фильмы отсутствуют");
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	}
+
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<Film> getFilms(@PathVariable Integer id) {
+	public ResponseEntity<Film> getFilm(@PathVariable Integer id) {
 		if (filmCollection.containsKey(id)) {
 			log.info("Получен фильм: {}", filmCollection.get(id).getName());
 			return ResponseEntity.ok(filmCollection.get(id));
 		}
-		log.info("Не найден фильм : {}", id);
+
+		log.warn("Не найден фильм : {}", id);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
@@ -48,7 +61,7 @@ public class FilmController {
 			log.info("Обновлен фильм: {}", updateFilm.getName());
 			return ResponseEntity.ok(true);
 		} else
-			log.info("Не найден фильм: {}", updateFilm.getName());
+			log.warn("Не найден фильм: {}", updateFilm.getName());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(false);
 	}
 
@@ -56,7 +69,7 @@ public class FilmController {
 	public ResponseEntity<Boolean> createFilm(@Validated @RequestBody Film newFilm) {
 
 		if (filmCollection.containsKey(newFilm.getId()) || newFilm.getId() == 0) {
-			log.info("Фильм с id {} уже существует  или  id = 0 : {}", newFilm.getId(), newFilm.getName());
+			log.warn("Фильм с id {} уже существует  или  id = 0 : {}", newFilm.getId(), newFilm.getName());
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
 		}
 
