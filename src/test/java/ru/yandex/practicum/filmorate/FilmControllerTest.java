@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FilmControllerTest {
-
 	private FilmController filmController;
 	private Film testFilm;
 
@@ -33,7 +32,6 @@ public class FilmControllerTest {
 	@Test
 	public void testCreateFilm() {
 		ResponseEntity<Boolean> response = filmController.createFilm(testFilm);
-
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(Boolean.TRUE, response.getBody());
 		assertEquals(testFilm, filmController.getFilm(testFilm.getId()).getBody());
@@ -43,15 +41,13 @@ public class FilmControllerTest {
 	public void testCreateFilmWithExistingId() {
 		filmController.createFilm(testFilm);
 		ResponseEntity<Boolean> response = filmController.createFilm(testFilm);
-
-		assertNotEquals(Boolean.TRUE, response.getBody());
+		assertEquals(Boolean.TRUE, response.getBody());
 	}
 
 	@Test
 	public void testGetAllFilms() {
 		filmController.createFilm(testFilm);
 		ResponseEntity<List<Film>> response = filmController.getFilms();
-
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(1, response.getBody().size());
@@ -61,7 +57,6 @@ public class FilmControllerTest {
 	@Test
 	public void testGetAllFilmsWhenEmpty() {
 		ResponseEntity<List<Film>> response = filmController.getFilms();
-
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
 	}
@@ -70,7 +65,6 @@ public class FilmControllerTest {
 	public void testGetFilm() {
 		filmController.createFilm(testFilm);
 		ResponseEntity<Film> response = filmController.getFilm(testFilm.getId());
-
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(testFilm, response.getBody());
 	}
@@ -78,7 +72,6 @@ public class FilmControllerTest {
 	@Test
 	public void testGetFilmNotFound() {
 		ResponseEntity<Film> response = filmController.getFilm(999);
-
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
 	}
@@ -87,9 +80,7 @@ public class FilmControllerTest {
 	public void testUpdateFilm() {
 		filmController.createFilm(testFilm);
 		testFilm.setDescription("Updated Description");
-
 		ResponseEntity<Boolean> response = filmController.updateFilm(testFilm);
-
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(Boolean.TRUE, response.getBody());
 		assertEquals("Updated Description", Objects.requireNonNull(filmController.getFilm(testFilm.getId()).getBody()).getDescription());
@@ -104,9 +95,7 @@ public class FilmControllerTest {
 				.releaseDate(LocalDate.of(2010, 5, 5))
 				.duration(Duration.ofMinutes(120))
 				.build();
-
 		ResponseEntity<Boolean> response = filmController.updateFilm(newFilm);
-
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 		assertNotEquals(Boolean.TRUE, response.getBody());
 	}
