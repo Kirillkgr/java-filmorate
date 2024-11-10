@@ -71,11 +71,11 @@ public class FilmController {
 
 	@PostMapping
 	public ResponseEntity<?> createFilm(@Validated @RequestBody FilmDTO newFilm) {
-//		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
-//
-//		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-//		}
+		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
+
+		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
+			return ResponseEntity.status(400).body(null);
+		}
 
 		if (newFilm.getId() == null) {
 			newFilm.setId(getNewId());
