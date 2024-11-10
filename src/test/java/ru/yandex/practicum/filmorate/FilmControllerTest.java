@@ -84,7 +84,7 @@ class FilmControllerTest {
 		ResponseEntity<FilmDTO> response = filmController.updateFilm(nonExistingFilm);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertNull(response.getBody());
+		assertNotNull(response.getBody());
 	}
 
 	@Test
