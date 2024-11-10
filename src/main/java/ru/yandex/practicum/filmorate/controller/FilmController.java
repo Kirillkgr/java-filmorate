@@ -74,7 +74,7 @@ public class FilmController {
 		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
 
 		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Дата выпуска фильма не может быть ранее 28 декабря 1895 года.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		if (newFilm.getId() == null) {
