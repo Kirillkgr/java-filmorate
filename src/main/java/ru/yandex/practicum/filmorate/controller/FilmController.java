@@ -78,7 +78,7 @@ public class FilmController {
 
 		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
 			log.warn("Некорректная дата релиза фильма: {}", newFilm.getReleaseDate());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Дата релиза должна быть не раньше 28 декабря 1895 года");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(newFilm);
 		}
 
 		newFilm.setId(newFilm.getId() == null ? getNewId() : newFilm.getId());
