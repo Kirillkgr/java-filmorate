@@ -61,12 +61,25 @@ public class FilmController {
 	}
 
 	@PutMapping
-	public ResponseEntity<Film> updateFilm(@Validated @RequestBody FilmDTO updateFilm) {
-		Film newFilmToSave = Film.builder().id(updateFilm.getId()).name(Optional.ofNullable(updateFilm.getName()).orElse("")).description(Optional.ofNullable(updateFilm.getDescription()).orElse("")).releaseDate(Optional.ofNullable(updateFilm.getReleaseDate()).orElse(LocalDate.now())).duration(Duration.ofMinutes(Optional.ofNullable(updateFilm.getDuration()).orElse(0))).build();
+	public ResponseEntity<FilmDTO> updateFilm(@Validated @RequestBody FilmDTO updateFilm) {
+		Film newFilmToSave = Film.builder()
+				.id(updateFilm.getId())
+				.name(Optional.ofNullable(updateFilm.getName()).orElse(""))
+				.description(Optional.ofNullable(updateFilm.getDescription()).orElse(""))
+				.releaseDate(Optional.ofNullable(updateFilm.getReleaseDate()).orElse(LocalDate.now()))
+				.duration(Duration.ofMinutes(Optional.ofNullable(updateFilm.getDuration()).orElse(0)))
+				.build();
 		if (filmCollection.containsKey(newFilmToSave.getId())) {
 			filmCollection.put(updateFilm.getId(), newFilmToSave);
 			log.info("Обновлен фильм: {}", updateFilm.getName());
-			return ResponseEntity.ok(filmCollection.get(newFilmToSave.getId()));
+			FilmDTO filmDTO = FilmDTO.builder()
+					.id(newFilmToSave.getId())
+					.name(newFilmToSave.getName())
+					.description(newFilmToSave.getDescription())
+					.releaseDate(newFilmToSave.getReleaseDate())
+					.duration((int) newFilmToSave.getDuration().toMinutes())
+					.build();
+			return ResponseEntity.ok(filmDTO);
 		} else {
 			log.warn("Не найден фильм для обновления с ID: {}", newFilmToSave.getId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
