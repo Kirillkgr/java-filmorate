@@ -61,13 +61,14 @@ public class FilmController {
 	}
 
 	@PutMapping
-	public ResponseEntity<Film> updateFilm(@RequestBody @Validated Film updateFilm) {
-		if (filmCollection.containsKey(updateFilm.getId())) {
-			filmCollection.put(updateFilm.getId(), updateFilm);
+	public ResponseEntity<Film> updateFilm(@Validated @RequestBody FilmDTO updateFilm) {
+		Film newFilmToSave = Film.builder().id(updateFilm.getId()).name(Optional.ofNullable(updateFilm.getName()).orElse("")).description(Optional.ofNullable(updateFilm.getDescription()).orElse("")).releaseDate(Optional.ofNullable(updateFilm.getReleaseDate()).orElse(LocalDate.now())).duration(Duration.ofMinutes(Optional.ofNullable(updateFilm.getDuration()).orElse(0))).build();
+		if (filmCollection.containsKey(newFilmToSave.getId())) {
+			filmCollection.put(updateFilm.getId(), newFilmToSave);
 			log.info("Обновлен фильм: {}", updateFilm.getName());
-			return ResponseEntity.ok(updateFilm);
+			return ResponseEntity.ok(filmCollection.get(newFilmToSave.getId()));
 		} else {
-			log.warn("Не найден фильм для обновления с ID: {}", updateFilm.getId());
+			log.warn("Не найден фильм для обновления с ID: {}", newFilmToSave.getId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 	}
