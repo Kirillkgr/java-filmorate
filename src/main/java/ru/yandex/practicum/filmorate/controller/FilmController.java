@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -32,61 +34,59 @@ public class FilmController {
 
 	public FilmController() {
 		filmCollection = new HashMap<>();
+		id = 1;
 	}
 
 	@GetMapping
 	public ResponseEntity<List<Film>> getFilms() {
 		if (!filmCollection.isEmpty()) {
-			log.info("Получен список фильмов в количестве : {}", filmCollection.size());
-			return ResponseEntity.ok(filmCollection.values().stream().toList());
+			log.info("Получен список фильмов в количестве: {}", filmCollection.size());
+			return ResponseEntity.ok(new ArrayList<>(filmCollection.values()));
 		}
 
 		log.warn("Фильмы отсутствуют");
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
-	@GetMapping(value = "/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<Film> getFilm(@PathVariable Integer id) {
-		if (filmCollection.containsKey(id)) {
-			log.info("Получен фильм: {}", filmCollection.get(id).getName());
-			return ResponseEntity.ok(filmCollection.get(id));
+		Film film = filmCollection.get(id);
+		if (film != null) {
+			log.info("Получен фильм: {}", film.getName());
+			return ResponseEntity.ok(film);
 		}
 
-		log.warn("Не найден фильм : {}", id);
+		log.warn("Не найден фильм с ID: {}", id);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	@PutMapping
-	public ResponseEntity<Film> updateFilm(@RequestBody Film updateFilm) {
+	public ResponseEntity<Film> updateFilm(@RequestBody @Validated Film updateFilm) {
 		if (filmCollection.containsKey(updateFilm.getId())) {
 			filmCollection.put(updateFilm.getId(), updateFilm);
 			log.info("Обновлен фильм: {}", updateFilm.getName());
 			return ResponseEntity.ok(updateFilm);
 		} else {
-			log.warn("Не найден фильм: {}", updateFilm.getName());
+			log.warn("Не найден фильм для обновления с ID: {}", updateFilm.getId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 	}
-
 
 	@PostMapping
 	public ResponseEntity<?> createFilm(@Validated @RequestBody FilmDTO newFilm) {
 		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
 
 		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
-			return ResponseEntity.status(400).body(null);
+			log.warn("Некорректная дата релиза фильма: {}", newFilm.getReleaseDate());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Дата релиза должна быть не раньше 28 декабря 1895 года");
 		}
 
-		if (newFilm.getId() == null) {
-			newFilm.setId(getNewId());
-		} else {
-			newFilm.setId(getNewId());
-		}
+		newFilm.setId(newFilm.getId() == null ? getNewId() : newFilm.getId());
 
-		Film newFilmToSave = Film.builder().id(newFilm.getId()).name(newFilm.getName() != null ? newFilm.getName() : "").description(newFilm.getDescription() != null ? newFilm.getDescription() : "").releaseDate(newFilm.getReleaseDate() != null ? newFilm.getReleaseDate() : LocalDate.now()).duration(Duration.ofMinutes(newFilm.getDuration() != null ? newFilm.getDuration() : 0)).build();
+		Film newFilmToSave = Film.builder().id(newFilm.getId()).name(Optional.ofNullable(newFilm.getName()).orElse("")).description(Optional.ofNullable(newFilm.getDescription()).orElse("")).releaseDate(Optional.ofNullable(newFilm.getReleaseDate()).orElse(LocalDate.now())).duration(Duration.ofMinutes(Optional.ofNullable(newFilm.getDuration()).orElse(0))).build();
 
 		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
-		log.info("Добавлен фильм: {}", newFilm);
+		log.info("Добавлен фильм: {}", newFilmToSave);
 
 		FilmDTO response = new FilmDTO(newFilmToSave.getId(), newFilmToSave.getName(), newFilmToSave.getDescription(), newFilmToSave.getReleaseDate(), (int) newFilmToSave.getDuration().toMinutes());
 
@@ -95,7 +95,6 @@ public class FilmController {
 
 
 	Integer getNewId() {
-		if (id == null) id = 1;
 		return id++;
 	}
 }
