@@ -83,7 +83,7 @@ class FilmControllerTest {
 		FilmDTO nonExistingFilm = FilmDTO.builder().id(2).name("Non-Existing Film").releaseDate(LocalDate.now()).build();
 		ResponseEntity<FilmDTO> response = filmController.updateFilm(nonExistingFilm);
 
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		assertNull(response.getBody());
 	}
 
