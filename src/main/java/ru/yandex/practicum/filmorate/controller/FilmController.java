@@ -64,7 +64,14 @@ public class FilmController {
 	public ResponseEntity<FilmDTO> updateFilm(@Validated @RequestBody FilmDTO updateFilm) {
 		if (!filmCollection.containsKey(updateFilm.getId())) {
 			log.warn("Не найден фильм для обновления с ID: {}", updateFilm.getId());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(FilmDTO.builder()
+							.id(updateFilm.getId())
+							.name("Фильм не найден")
+							.description("Фильм с таким ID отсутствует в базе")
+							.releaseDate(updateFilm.getReleaseDate())
+							.duration(updateFilm.getDuration())
+							.build());
 		}
 
 		Film newFilmToSave = Film.builder()
