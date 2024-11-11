@@ -89,9 +89,8 @@ public class FilmController {
 			return ResponseEntity.ok(filmDTO);
 
 		} else {
-
 			log.warn("Не найден фильм для обновления с ID: {}", newFilmToSave.getId());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updateFilm);
 		}
 	}
 
