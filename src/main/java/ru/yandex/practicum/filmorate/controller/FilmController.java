@@ -65,7 +65,7 @@ public class FilmController {
 		if (!filmCollection.containsKey(updateFilm.getId())) {
 			log.warn("Не найден фильм для обновления с ID: {}", updateFilm.getId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(null);
+					.body(updateFilm);
 		}
 
 		Film newFilmToSave = Film.builder()
@@ -88,10 +88,8 @@ public class FilmController {
 					.build();
 			return ResponseEntity.ok(filmDTO);
 
-		} else {
-			log.warn("Не найден фильм для обновления с ID: {}", newFilmToSave.getId());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updateFilm);
 		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 	}
 
 	@PostMapping
