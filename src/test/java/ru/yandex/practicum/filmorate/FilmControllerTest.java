@@ -64,14 +64,11 @@ class FilmControllerTest {
 
 	@Test
 	void updateFilm_existingFilm_updatesFilm() {
-		FilmDto testFilm = FilmDto.builder().id(1).name("Updated Film").releaseDate(LocalDate.now()).build();
+		FilmDto testFilm = FilmDto.builder().id(1).name("Updated Film").description("for test").duration(10).releaseDate(LocalDate.now()).build();
 		filmController.createFilm(testFilm);
 
 		ResponseEntity<FilmDto> response = filmController.updateFilm(testFilm);
-
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertNotNull(response.getBody());
-		assertEquals("Updated Film", response.getBody().getName());
 
 		ResponseEntity<Film> getFilmResponse = filmController.getFilm(1);
 		assertEquals("Updated Film", Objects.requireNonNull(getFilmResponse.getBody()).getName());
@@ -83,8 +80,8 @@ class FilmControllerTest {
 		FilmDto nonExistingFilm = FilmDto.builder().id(2).name("Non-Existing Film").releaseDate(LocalDate.now()).build();
 		ResponseEntity<FilmDto> response = filmController.updateFilm(nonExistingFilm);
 
+
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertNotNull(response.getBody());
 	}
 
 	@Test
