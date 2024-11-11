@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.filmorate.DTO.FilmDTO;
+import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -32,7 +32,7 @@ class FilmControllerTest {
 
 	@Test
 	void getFilms_withFilms_returnsFilms() {
-		FilmDTO testFilm = FilmDTO.builder().id(1).name("Test Film").releaseDate(LocalDate.now()).build();
+		FilmDto testFilm = FilmDto.builder().id(1).name("Test Film").releaseDate(LocalDate.now()).build();
 		filmController.createFilm(testFilm);
 
 		ResponseEntity<List<Film>> response = filmController.getFilms();
@@ -44,7 +44,7 @@ class FilmControllerTest {
 
 	@Test
 	void getFilm_existingFilm_returnsFilm() {
-		FilmDTO testFilm = FilmDTO.builder().name("Test Film").description("test description").releaseDate(LocalDate.now()).build();
+		FilmDto testFilm = FilmDto.builder().name("Test Film").description("test description").releaseDate(LocalDate.now()).build();
 
 
 		filmController.createFilm(testFilm);
@@ -64,10 +64,10 @@ class FilmControllerTest {
 
 	@Test
 	void updateFilm_existingFilm_updatesFilm() {
-		FilmDTO testFilm = FilmDTO.builder().id(1).name("Updated Film").releaseDate(LocalDate.now()).build();
+		FilmDto testFilm = FilmDto.builder().id(1).name("Updated Film").releaseDate(LocalDate.now()).build();
 		filmController.createFilm(testFilm);
 
-		ResponseEntity<FilmDTO> response = filmController.updateFilm(testFilm);
+		ResponseEntity<FilmDto> response = filmController.updateFilm(testFilm);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
@@ -80,8 +80,8 @@ class FilmControllerTest {
 	@Test
 	void updateFilm_nonExistingFilm_returnsNoContent() {
 
-		FilmDTO nonExistingFilm = FilmDTO.builder().id(2).name("Non-Existing Film").releaseDate(LocalDate.now()).build();
-		ResponseEntity<FilmDTO> response = filmController.updateFilm(nonExistingFilm);
+		FilmDto nonExistingFilm = FilmDto.builder().id(2).name("Non-Existing Film").releaseDate(LocalDate.now()).build();
+		ResponseEntity<FilmDto> response = filmController.updateFilm(nonExistingFilm);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNotNull(response.getBody());
@@ -89,8 +89,8 @@ class FilmControllerTest {
 
 	@Test
 	void createFilm_newFilm_createsFilm() {
-		FilmDTO newFilm = FilmDTO.builder().name("New Film").releaseDate(LocalDate.now()).build();
-		ResponseEntity<FilmDTO> response = (ResponseEntity<FilmDTO>) filmController.createFilm(newFilm);
+		FilmDto newFilm = FilmDto.builder().name("New Film").releaseDate(LocalDate.now()).build();
+		ResponseEntity<FilmDto> response = (ResponseEntity<FilmDto>) filmController.createFilm(newFilm);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());

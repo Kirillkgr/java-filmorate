@@ -84,7 +84,7 @@ public class UserController {
 		return ResponseEntity.ok(newUser);
 	}
 
-	Integer getNewId() {
+	private Integer getNewId() {
 		if (id == null) {
 			id = 0;
 		}

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.DTO.FilmDTO;
+import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 
 @Slf4j
@@ -61,31 +61,25 @@ public class FilmController {
 	}
 
 	@PutMapping
-	public ResponseEntity<FilmDTO> updateFilm(@Validated @RequestBody FilmDTO updateFilm) {
+	public ResponseEntity<FilmDto> updateFilm(@Validated @RequestBody FilmDto updateFilm) {
 		if (!filmCollection.containsKey(updateFilm.getId())) {
 			log.warn("Не найден фильм для обновления с ID: {}", updateFilm.getId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(FilmDTO.builder()
-							.id(updateFilm.getId())
-							.name("Фильм не найден")
-							.description("Фильм с таким ID отсутствует в базе")
-							.releaseDate(updateFilm.getReleaseDate())
-							.duration(updateFilm.getDuration())
-							.build());
+					.body(null);
 		}
 
 		Film newFilmToSave = Film.builder()
 				.id(updateFilm.getId())
-				.name(Optional.ofNullable(updateFilm.getName()).orElse(""))
-				.description(Optional.ofNullable(updateFilm.getDescription()).orElse(""))
-				.releaseDate(Optional.ofNullable(updateFilm.getReleaseDate()).orElse(LocalDate.now()))
-				.duration(Duration.ofMinutes(Optional.ofNullable(updateFilm.getDuration()).orElse(0)))
+				.name(updateFilm.getName())
+				.description(updateFilm.getDescription())
+				.releaseDate(updateFilm.getReleaseDate())
+				.duration(Duration.ofMinutes(updateFilm.getDuration()))
 				.build();
 
 		if (filmCollection.containsKey(newFilmToSave.getId())) {
 			filmCollection.put(updateFilm.getId(), newFilmToSave);
 			log.info("Обновлен фильм: {}", updateFilm.getName());
-			FilmDTO filmDTO = FilmDTO.builder()
+			FilmDto filmDTO = FilmDto.builder()
 					.id(newFilmToSave.getId())
 					.name(newFilmToSave.getName())
 					.description(newFilmToSave.getDescription())
@@ -102,7 +96,7 @@ public class FilmController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> createFilm(@Validated @RequestBody FilmDTO newFilm) {
+	public ResponseEntity<?> createFilm(@Validated @RequestBody FilmDto newFilm) {
 		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
 
 		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
@@ -117,13 +111,13 @@ public class FilmController {
 		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
 		log.info("Добавлен фильм: {}", newFilmToSave);
 
-		FilmDTO response = new FilmDTO(newFilmToSave.getId(), newFilmToSave.getName(), newFilmToSave.getDescription(), newFilmToSave.getReleaseDate(), (int) newFilmToSave.getDuration().toMinutes());
+		FilmDto response = new FilmDto(newFilmToSave.getId(), newFilmToSave.getName(), newFilmToSave.getDescription(), newFilmToSave.getReleaseDate(), (int) newFilmToSave.getDuration().toMinutes());
 
 		return ResponseEntity.ok(response);
 	}
 
 
-	Integer getNewId() {
+	private Integer getNewId() {
 		return id++;
 	}
 }

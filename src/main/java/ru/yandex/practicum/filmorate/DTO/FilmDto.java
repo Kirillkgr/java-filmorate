@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.DTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -26,26 +25,27 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
-public class FilmDTO {
+public class FilmDto {
 
 	Integer id;
+
 	@NotNull
 	@NotBlank
 	String name;
+
 	@NotNull
 	@Size(min = 1, max = 200)
 	@EqualsAndHashCode.Exclude
 	String description;
+
 	@NotNull
-	@Past
 	@EqualsAndHashCode.Exclude
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	LocalDate releaseDate;
+
 	@NotNull
 	@EqualsAndHashCode.Exclude
-
 	@Positive
 	Integer duration;
-
 }
 
