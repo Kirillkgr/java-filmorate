@@ -65,7 +65,7 @@ public class FilmController {
 		if (!filmCollection.containsKey(updateFilm.getId())) {
 			log.warn("Не найден фильм для обновления с ID: {}", updateFilm.getId());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(updateFilm);
+					.body(null);
 		}
 
 		Film newFilmToSave = Film.builder()
