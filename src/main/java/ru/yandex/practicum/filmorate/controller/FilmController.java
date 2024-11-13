@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -61,10 +61,10 @@ public class FilmController {
 	}
 
 	@PutMapping
-	public ResponseEntity<FilmDto> updateFilm(@Validated @RequestBody FilmDto updateFilm) {
+	public ResponseEntity<Void> updateFilm(@Validated @RequestBody FilmDto updateFilm) {
 		if (!filmCollection.containsKey(updateFilm.getId())) {
 			log.warn("Не найден фильм для обновления с ID: {}", updateFilm.getId());
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
 		Film newFilmToSave = Film.builder()
@@ -78,14 +78,7 @@ public class FilmController {
 		if (filmCollection.containsKey(newFilmToSave.getId())) {
 			filmCollection.put(updateFilm.getId(), newFilmToSave);
 			log.info("Обновлен фильм: {}", updateFilm.getName());
-			FilmDto filmDTO = FilmDto.builder()
-					.id(newFilmToSave.getId())
-					.name(newFilmToSave.getName())
-					.description(newFilmToSave.getDescription())
-					.releaseDate(newFilmToSave.getReleaseDate())
-					.duration((int) newFilmToSave.getDuration().toMinutes())
-					.build();
-			return ResponseEntity.ok(filmDTO);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -102,7 +95,14 @@ public class FilmController {
 
 		newFilm.setId(newFilm.getId() == null ? getNewId() : newFilm.getId());
 
-		Film newFilmToSave = Film.builder().id(newFilm.getId()).name(Optional.ofNullable(newFilm.getName()).orElse("")).description(Optional.ofNullable(newFilm.getDescription()).orElse("")).releaseDate(Optional.ofNullable(newFilm.getReleaseDate()).orElse(LocalDate.now())).duration(Duration.ofMinutes(Optional.ofNullable(newFilm.getDuration()).orElse(0))).build();
+		Film newFilmToSave = Film
+				.builder()
+				.id(newFilm.getId())
+				.name(newFilm.getName())
+				.description(newFilm.getDescription())
+				.releaseDate(newFilm.getReleaseDate())
+				.duration(Duration.ofMinutes(newFilm.getDuration()))
+				.build();
 
 		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
 		log.info("Добавлен фильм: {}", newFilmToSave);
