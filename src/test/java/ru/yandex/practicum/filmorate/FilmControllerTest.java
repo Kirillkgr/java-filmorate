@@ -69,7 +69,7 @@ class FilmControllerTest {
 		filmController.createFilm(testFilm);
 
 		ResponseEntity<FilmDto> response = filmController.updateFilm(testFilm);
-		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+		assertEquals(HttpStatus.OK, response.getStatusCode());
 
 		ResponseEntity<Film> getFilmResponse = filmController.getFilm(1);
 		assertEquals("Updated Film", Objects.requireNonNull(getFilmResponse.getBody()).getName());
