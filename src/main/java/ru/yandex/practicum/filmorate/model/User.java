@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,4 +42,7 @@ public class User {
 	@EqualsAndHashCode.Exclude
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	LocalDate birthday;
+
+	@NotNull
+	Set<Long> friendsIds;
 }

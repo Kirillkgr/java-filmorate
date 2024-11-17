@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate;
 
 import java.util.Objects;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.controller.UserController;
 
 import java.util.List;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 class UserControllerTest {
 
@@ -18,7 +23,8 @@ class UserControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		userController = new UserController();
+		UserStorage userStorage = new InMemoryUserStorage();
+		userController = new UserController(userStorage);
 	}
 
 	@Test
@@ -86,7 +92,7 @@ class UserControllerTest {
 
 	@Test
 	void createUser_newUser_createsUser() {
-		User newUser = User.builder().name("New User").email("new@example.com").build();
+		User newUser = User.builder().login("login").name("New User").email("new@example.com").build();
 		ResponseEntity<User> response = userController.createUser(newUser);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -96,7 +102,7 @@ class UserControllerTest {
 
 	@Test
 	void createUser_duplicateId_conflict() {
-		User firstUser = User.builder().id(1).name("First User").email("first@example.com").build();
+		User firstUser = User.builder().id(1).login("login").name("First User").email("first@example.com").build();
 		userController.createUser(firstUser);
 
 		User duplicateUser = User.builder().id(1).name("First User").email("duplicate@example.com").build();

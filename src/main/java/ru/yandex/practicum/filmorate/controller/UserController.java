@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import java.util.Map;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
-import java.util.HashMap;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
@@ -17,78 +18,55 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-	final Map<Integer, User> usersCollection;
-	Integer id;
 
-	public UserController() {
-		usersCollection = new HashMap<>();
-	}
+	final UserStorage userStorage;
+
 
 	@GetMapping()
 	public ResponseEntity<List<User>> getUsers() {
-		if (!usersCollection.isEmpty()) {
-			log.info("Выдан список пользователей в количестве : {}", usersCollection.size());
-			return ResponseEntity.ok(usersCollection.values().stream().toList());
-		}
-		log.info("В базе отсутствуют фильмы");
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		List<User> users = userStorage.getUsers();
+		if (users != null) {
+			return ResponseEntity.ok(users);
+		} else
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<User> getUser(@Validated @PathVariable Integer id) {
-		if (usersCollection.containsKey(id)) {
-			log.info("Получен пользователь : {}", usersCollection.get(id).getName());
-			return ResponseEntity.ok(usersCollection.get(id));
-		}
-		log.info("Не найден пользователь : {}", id);
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	public ResponseEntity<User> getUser(@PathVariable @NotNull @Positive Integer id) {
+		User user = userStorage.getUser(id);
+		if (user != null) {
+			return ResponseEntity.ok(user);
+		} else
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 	@PutMapping
 	public ResponseEntity<User> updateUser(@Validated @RequestBody User updateUser) {
-		if (usersCollection.containsKey(updateUser.getId())) {
-			usersCollection.put(updateUser.getId(), updateUser);
-			log.info("Обновлен пользователь: {}", updateUser.getName());
-			return ResponseEntity.ok(updateUser);
-		} else {
-			log.warn("Не найден пользователь с id: {}", updateUser.getId());
+		User actualUser = userStorage.updateUser(updateUser);
+		if (actualUser == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updateUser);
-		}
+		} else
+			return ResponseEntity.ok(actualUser);
 	}
 
 
 	@PostMapping
 	public ResponseEntity<User> createUser(@Validated @RequestBody User newUser) {
-		// Устанавливаем имя пользователя по умолчанию, если оно не указано
-		if (newUser.getName() == null || newUser.getName().isBlank()) {
-			newUser.setName(newUser.getLogin());
-		}
-
-		// Проверяем, существует ли пользователь с таким ID
-		User userExist = newUser.getId() != null ? usersCollection.get(newUser.getId()) : null;
-		if (userExist != null) {
+		User user = userStorage.createUser(newUser);
+		if (user == null) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(newUser);
-		}
-
-		// Назначаем ID, если он не задан, и добавляем пользователя в коллекцию
-		newUser.setId(getNewId());
-		usersCollection.put(newUser.getId(), newUser);
-		log.info("Добавлен пользователь: {}", newUser);
-		return ResponseEntity.ok(newUser);
+		} else
+			return ResponseEntity.ok(user);
 	}
 
-	private Integer getNewId() {
-		if (id == null) {
-			id = 0;
-		}
-		return ++id;
-	}
 
 }
