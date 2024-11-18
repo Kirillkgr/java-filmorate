@@ -71,11 +71,15 @@ public class UserController {
 
 	@PutMapping(value = "/{parentId}/friends/{childId}")
 	public ResponseEntity<User> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
-		User user = userStorage.addFriend(parentId, childId);
-		if (user == null) {
+		User parent = userStorage.getUser(parentId);
+		User child = userStorage.getUser(childId);
+
+		if (parent == null || child == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-		} else
+		} else {
+			User user = userStorage.addFriend(parentId, childId);
 			return ResponseEntity.ok(user);
+		}
 	}
 
 	@DeleteMapping(value = "/{parentId}/friends/{childId}")
