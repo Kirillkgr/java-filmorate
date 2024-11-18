@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,4 +66,33 @@ public class FilmController {
 		newFilm = filmStorage.createFilm(newFilm);
 		return ResponseEntity.ok(newFilm);
 	}
+
+	// new
+	@PutMapping(value = "/{filmId}/like/{userId}")
+	public ResponseEntity<Film> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+		Film film = filmStorage.addLike(filmId, userId);
+		if (film == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+		return ResponseEntity.ok(film);
+	}
+
+	@DeleteMapping(value = "/{filmId}/like/{userId}")
+	public ResponseEntity<Film> deleteLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+		Film film = filmStorage.deleteLike(filmId, userId);
+		if (film == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+		return ResponseEntity.ok(film);
+	}
+
+	@GetMapping(value = "/popular?count={count}")
+	public ResponseEntity<List<Film>> getPopularFilms(@PathVariable Integer count) {
+		List<Film> filmCollection = filmStorage.getPopularFilms(count);
+		if (filmCollection != null && !filmCollection.isEmpty()) {
+			return ResponseEntity.ok(new ArrayList<>(filmCollection));
+		}
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	}
+
 }
