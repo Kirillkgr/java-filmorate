@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -44,8 +46,13 @@ public class User {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	LocalDate birthday;
 
-	//	@NotNull
 	@ToString.Exclude
-	@JsonIgnore
-	Set<Long> friendsIds;
+	Set<Integer> friendsIds;
+
+	public Set<Integer> getFriends() {
+		if (friendsIds == null) {
+			friendsIds = new HashSet<>();
+		}
+		return friendsIds;
+	}
 }

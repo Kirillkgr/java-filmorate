@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +77,52 @@ public class InMemoryUserStorage implements UserStorage {
 	}
 
 	@Override
-	public User addFriend(Integer id, Integer friendId) {
+	public User addFriend(Integer parentId, Integer childId) {
+		User parent = usersCollection.get(parentId);
+		if (parent != null) {
+			parent.getFriends().add(childId);
+			User child = usersCollection.get(childId);
+			child.getFriends().add(parentId);
+			log.info("Добавлен друг для друга : {}", parent.getName() + " и " + child.getName());
+			return parent;
+		}
+		return null;
+	}
+
+	@Override
+	public User deleteFriend(Integer parentId, Integer childId) {
+		User parent = usersCollection.get(parentId);
+		if (parent != null) {
+			parent.getFriends().remove(childId);
+			User child = usersCollection.get(childId);
+			child.getFriends().remove(parentId);
+			log.info("Удален друг для друга : {}", parent.getName() + " и " + child.getName());
+			return parent;
+		}
+		return null;
+	}
+
+	@Override
+	public List<User> getCommonFriends(Integer parentId, Integer childId) {
+		User parentUser = usersCollection.get(parentId);
+		User childUser = usersCollection.get(childId);
+
+		Set<Integer> commonFriends = new HashSet<>(parentUser.getFriends());
+		commonFriends.retainAll(childUser.getFriends());
+
+		if (!commonFriends.isEmpty()) {
+			return commonFriends.stream().map(usersCollection::get).toList();
+		}
+
+		return null;
+	}
+
+	@Override
+	public List<User> getFriends(Integer id) {
+		User user = usersCollection.get(id);
+		if (user != null) {
+			return user.getFriends().stream().map(usersCollection::get).toList();
+		}
 		return null;
 	}
 

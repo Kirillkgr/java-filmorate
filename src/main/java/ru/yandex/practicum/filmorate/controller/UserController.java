@@ -3,12 +3,14 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,12 +70,39 @@ public class UserController {
 			return ResponseEntity.ok(user);
 	}
 
-	@PutMapping(value = "/{id}/friends/{friendId}")
-	public ResponseEntity<User> addFriend(@PathVariable @NotNull @Positive Integer id, @PathVariable @NotNull @Positive Integer friendId) {
-		User user = userStorage.addFriend(id, friendId);
+	@PutMapping(value = "/{parentId}/friends/{childId}")
+	public ResponseEntity<User> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+		User user = userStorage.addFriend(parentId, childId);
 		if (user == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} else
 			return ResponseEntity.ok(user);
+	}
+
+	@DeleteMapping(value = "/{parentId}/friends/{childId}")
+	public ResponseEntity<User> deleteFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+		User user = userStorage.deleteFriend(parentId, childId);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		} else
+			return ResponseEntity.ok(user);
+	}
+
+	@GetMapping(value = "/{parentId}/friends")
+	public ResponseEntity<List<User>> getFriends(@PathVariable @NotNull @Positive Integer parentId) {
+		List<User> friends = userStorage.getFriends(parentId);
+		if (friends != null) {
+			return ResponseEntity.ok(friends);
+		} else
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	}
+
+	@GetMapping(value = "/{parentId}/friends/common/{otherId}")
+	public ResponseEntity<List<User>> getCommonFriends(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer otherId) {
+		List<User> friends = userStorage.getCommonFriends(parentId, otherId);
+		if (friends != null) {
+			return ResponseEntity.ok(friends);
+		} else
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 }
