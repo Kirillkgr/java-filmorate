@@ -68,5 +68,12 @@ public class UserController {
 			return ResponseEntity.ok(user);
 	}
 
-
+	@PutMapping(value = "/{id}/friends/{friendId}")
+	public ResponseEntity<User> addFriend(@PathVariable @NotNull @Positive Integer id, @PathVariable @NotNull @Positive Integer friendId) {
+		User user = userStorage.addFriend(id, friendId);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		} else
+			return ResponseEntity.ok(user);
+	}
 }

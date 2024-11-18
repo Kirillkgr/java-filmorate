@@ -26,6 +26,7 @@ public class CustomExceptionHandler {
 	public ResponseEntity<String> handleException() {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error");
 	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
 		Map<String, String> errors = new HashMap<>();
