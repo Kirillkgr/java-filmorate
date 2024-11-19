@@ -11,11 +11,11 @@ public interface FilmStorage {
 
 	FilmDto updateFilm(FilmDto updateFilm);
 
-	FilmDto createFilm(FilmDto newFilm);
-
 	Film addLike(Integer id, Integer userId);
 
 	Film deleteLike(Integer filmId, Integer userId);
 
 	List<Film> getPopularFilms(Integer count);
+
+	Film createFilm(FilmDto newFilm);
 }

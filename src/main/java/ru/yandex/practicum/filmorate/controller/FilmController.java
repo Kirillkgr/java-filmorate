@@ -22,6 +22,8 @@ import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import static ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage.convertFilmToFilmDto;
+
 @Slf4j
 @Validated
 @RestController
@@ -52,9 +54,7 @@ public class FilmController {
 
 	@PutMapping
 	public ResponseEntity<FilmDto> updateFilm(@Validated @RequestBody FilmDto updateFilm) {
-
 		FilmDto filmDto = filmStorage.updateFilm(updateFilm);
-
 		if (filmDto == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
@@ -63,7 +63,8 @@ public class FilmController {
 
 	@PostMapping
 	public ResponseEntity<FilmDto> createFilm(@Validated @RequestBody FilmDto newFilm) {
-		newFilm = filmStorage.createFilm(newFilm);
+		Film film = filmStorage.createFilm(newFilm);
+		newFilm = convertFilmToFilmDto(film);
 		return ResponseEntity.ok(newFilm);
 	}
 
@@ -88,11 +89,16 @@ public class FilmController {
 
 	@GetMapping(value = "/popular?count={count}")
 	public ResponseEntity<List<Film>> getPopularFilms(@PathVariable Integer count) {
-		List<Film> filmCollection = filmStorage.getPopularFilms(count);
-		if (filmCollection != null && !filmCollection.isEmpty()) {
-			return ResponseEntity.ok(new ArrayList<>(filmCollection));
+		try {
+			List<Film> filmCollection = filmStorage.getPopularFilms(count);
+			if (filmCollection != null && !filmCollection.isEmpty()) {
+				return ResponseEntity.ok(filmCollection);
+			}
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		} catch (Exception e) {
+			log.error("Error getting popular films", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
 }

@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,23 +69,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 		return filmDTO;
 	}
 
-
-	@Override
-	public FilmDto createFilm(FilmDto newFilm) {
-		LocalDate minReleaseDate = LocalDate.of(1895, 12, 28);
-
-		if (newFilm.getReleaseDate().isBefore(minReleaseDate)) {
-			log.warn("Некорректная дата релиза фильма: {}", newFilm.getReleaseDate());
-			return newFilm;
-		}
-
-		newFilm.setId(newFilm.getId() == null ? getNewId() : newFilm.getId());
-		Film newFilmToSave = convertFilmDtoToFilm(newFilm);
-		filmCollection.put(newFilmToSave.getId(), newFilmToSave);
-		log.info("Добавлен фильм: {}", newFilmToSave);
-		return convertFilmToFilmDto(newFilmToSave);
-	}
-
 	@Override
 	public Film addLike(Integer id, Integer userId) {
 		Film film = filmCollection.get(id);
@@ -117,7 +100,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 		return List.of();
 	}
 
-	private static FilmDto convertFilmToFilmDto(Film newFilmToSave) {
+	public static FilmDto convertFilmToFilmDto(Film newFilmToSave) {
 		FilmDto filmDTO;
 		filmDTO = FilmDto.builder()
 				.id(newFilmToSave.getId())
@@ -140,8 +123,15 @@ public class InMemoryFilmStorage implements FilmStorage {
 				.build();
 	}
 
-	private Integer getNewId() {
-		return id++;
+	public Film createFilm(FilmDto newFilm) {
+		int newId = getNextId(); // Method that returns the next available ID
+		Film film = new Film(newId, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), Duration.ofMinutes(newFilm.getDuration()), new HashSet<>());
+		filmCollection.put(newId, film);
+		return film;
+	}
+
+	private int getNextId() {
+		return filmCollection.size() + 1;
 	}
 
 }
