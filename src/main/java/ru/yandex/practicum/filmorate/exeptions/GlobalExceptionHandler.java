@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.exeptions;
 import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -28,6 +29,15 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	}
 
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
+		Map<String, String> errors = new HashMap<>();
+		for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+			errors.put(error.getField(), error.getDefaultMessage());
+		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+	}
+
 	@ExceptionHandler(ValidationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public Map<String, String> handleValidationException(ValidationException e) {
@@ -44,14 +54,4 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Unexpected error: " + ex.getMessage()));
 	}
-
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		StringBuilder errors = new StringBuilder();
-		ex.getBindingResult().getAllErrors().forEach(error -> {
-			errors.append(error.getDefaultMessage()).append("\n");
-		});
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.toString());
-	}
-
 }
