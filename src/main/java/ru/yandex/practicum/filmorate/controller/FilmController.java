@@ -75,7 +75,7 @@ public class FilmController {
 		Film film = filmStorage.addLike(filmId, userId);
 		if (film == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("error", "Film with id " + filmId + " not found"));
+					.body(Map.of("error", "Film with or user not found"));
 		}
 		return ResponseEntity.ok(film);
 	}

@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 @Slf4j
 @Component
@@ -21,11 +23,13 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 public class InMemoryFilmStorage implements FilmStorage {
 
 	final Map<Integer, Film> filmCollection;
+	private final InMemoryUserStorage inMemoryUserStorage;
 	Integer id;
 
-	public InMemoryFilmStorage() {
+	public InMemoryFilmStorage(InMemoryUserStorage inMemoryUserStorage) {
 		filmCollection = new HashMap<>();
 		id = 0;
+		this.inMemoryUserStorage = inMemoryUserStorage;
 	}
 
 
@@ -72,7 +76,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 	@Override
 	public Film addLike(Integer id, Integer userId) {
 		Film film = filmCollection.get(id);
-		if (film != null) {
+		User user = inMemoryUserStorage.getUser(userId);
+		if (film != null && user != null) {
 			film.getLikeUsers().add(userId);
 			log.info("Added like from user {} to film {}", userId, id);
 			return film;
