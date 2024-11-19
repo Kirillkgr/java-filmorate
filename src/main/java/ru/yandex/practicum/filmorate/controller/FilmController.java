@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -90,18 +92,16 @@ public class FilmController {
 		return ResponseEntity.ok(film);
 	}
 
-	@GetMapping(value = "/popular?count={count}")
-	public ResponseEntity<List<Film>> getPopularFilms(@PathVariable Integer count) {
+	@GetMapping(value = "/popular")
+	public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
 		try {
-			List<Film> filmCollection = filmStorage.getPopularFilms(count);
-			if (filmCollection != null && !filmCollection.isEmpty()) {
-				return ResponseEntity.ok(filmCollection);
-			}
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			List<Film> popularFilms = filmStorage.getPopularFilms(count);
+			return ResponseEntity.ok(popularFilms);
 		} catch (Exception e) {
-			log.error("Error getting popular films", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Collections.emptyList());
 		}
 	}
+
 
 }
