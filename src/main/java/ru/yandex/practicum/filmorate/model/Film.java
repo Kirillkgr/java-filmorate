@@ -49,7 +49,7 @@ public class Film {
 	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
 	@EqualsAndHashCode.Exclude
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	LocalDate releaseDate;
+	private LocalDate releaseDate;
 
 	@NotNull
 	@EqualsAndHashCode.Exclude
