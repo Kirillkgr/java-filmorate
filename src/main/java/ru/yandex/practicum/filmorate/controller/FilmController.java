@@ -56,7 +56,7 @@ public class FilmController {
 	public ResponseEntity<FilmDto> updateFilm(@Validated @RequestBody FilmDto updateFilm) {
 		FilmDto filmDto = filmStorage.updateFilm(updateFilm);
 		if (filmDto == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updateFilm);
 		}
 		return ResponseEntity.ok(filmDto);
 	}
