@@ -75,7 +75,7 @@ public class UserController {
 		User child = userStorage.getUser(childId);
 
 		if (parent == null || child == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(parent);
 		} else {
 			User user = userStorage.addFriend(parentId, childId);
 			return ResponseEntity.ok(user);
