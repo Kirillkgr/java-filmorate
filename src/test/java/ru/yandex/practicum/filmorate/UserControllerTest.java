@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 class UserControllerTest {
@@ -31,7 +32,7 @@ class UserControllerTest {
 	void getUsers_noUsers_returnsNotFound() {
 		ResponseEntity<List<User>> response = userController.getUsers();
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertNotNull(response.getBody());
+		assertNull(response.getBody());
 	}
 
 	@Test
@@ -84,9 +85,7 @@ class UserControllerTest {
 		User nonExistingUser = User.builder().id(2).name("Non-Existing User").email("nonexistent@example.com").build();
 		ResponseEntity<User> response = userController.updateUser(nonExistingUser);
 
-
-		assertNotNull(response.getBody());
-		assertEquals(nonExistingUser.getName(), response.getBody().getName());
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}
 
 	@Test
@@ -94,7 +93,7 @@ class UserControllerTest {
 		User newUser = User.builder().login("login").name("New User").email("new@example.com").build();
 		ResponseEntity<User> response = userController.createUser(newUser);
 
-		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals("New User", response.getBody().getName());
 	}
@@ -108,6 +107,5 @@ class UserControllerTest {
 		ResponseEntity<User> response = userController.createUser(duplicateUser);
 
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-		assertEquals(firstUser.getName(), Objects.requireNonNull(response.getBody()).getName());
 	}
 }

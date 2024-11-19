@@ -14,9 +14,9 @@ public interface UserStorage {
 
 	User createUser(User newUser);
 
-	User addFriend(@NotNull @Positive Integer id, @NotNull @Positive Integer friendId);
+	boolean addFriend(@NotNull @Positive Integer id, @NotNull @Positive Integer friendId);
 
-	User deleteFriend(@NotNull @Positive Integer id, @NotNull @Positive Integer friendId);
+	boolean deleteFriend(@NotNull @Positive Integer id, @NotNull @Positive Integer friendId);
 
 	List<User> getCommonFriends(@NotNull @Positive Integer id, @NotNull @Positive Integer otherId);
 
