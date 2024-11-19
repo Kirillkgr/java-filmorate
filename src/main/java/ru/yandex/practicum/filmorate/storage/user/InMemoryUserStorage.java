@@ -63,7 +63,6 @@ public class InMemoryUserStorage implements UserStorage {
 		if (newUser.getName() == null || newUser.getName().isBlank()) {
 			newUser.setName(newUser.getLogin());
 		}
-
 		User userExist = newUser.getId() != null ? usersCollection.get(newUser.getId()) : null;
 		if (userExist != null) {
 			log.warn("Пользователь с id: {} уже существует", newUser.getId());
