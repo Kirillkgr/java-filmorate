@@ -34,21 +34,22 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
-		Map<String, String> errorResponse = Map.of("error", "Unexpected error: " + ex.getMessage());
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-	}
-
-	@ExceptionHandler(NotFoundException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public Map<String, String> handleNotFoundException(NotFoundException e) {
-		return Map.of("error", e.getMessage());
-	}
-
 	@ExceptionHandler(ValidationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public Map<String, String> handleValidationException(ValidationException e) {
 		return Map.of("error", e.getMessage());
+	}
+
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException e) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("error", e.getMessage()));
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(Map.of("error", "Unexpected error: " + ex.getMessage()));
 	}
 }

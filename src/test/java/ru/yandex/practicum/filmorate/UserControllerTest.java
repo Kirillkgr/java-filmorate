@@ -52,7 +52,7 @@ class UserControllerTest {
 		User testUser = User.builder().id(1).name("Test User").email("test@example.com").build();
 		userController.createUser(testUser);
 
-		ResponseEntity<User> response = (ResponseEntity<User>) userController.getUser(1);
+		ResponseEntity<User> response = userController.getUser(1);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(testUser.getName(), response.getBody().getName());
@@ -60,7 +60,7 @@ class UserControllerTest {
 
 	@Test
 	void getUser_nonExistingUser_returnsNotFound() {
-		ResponseEntity<User> response = (ResponseEntity<User>) userController.getUser(1);
+		ResponseEntity<User> response = userController.getUser(1);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}
 
@@ -70,20 +70,20 @@ class UserControllerTest {
 		userController.createUser(testUser);
 
 		User updatedUser = User.builder().id(1).name("Updated User").email("updated@example.com").build();
-		ResponseEntity<User> response = userController.updateUser(updatedUser);
+		ResponseEntity<User> response = (ResponseEntity<User>) userController.updateUser(updatedUser);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals("Updated User", response.getBody().getName());
 
-		ResponseEntity<User> getUserResponse = (ResponseEntity<User>) userController.getUser(1);
+		ResponseEntity<User> getUserResponse = userController.getUser(1);
 		assertEquals("Updated User", Objects.requireNonNull(getUserResponse.getBody()).getName());
 	}
 
 	@Test
 	void updateUser_nonExistingUser_returnsNoContent() {
 		User nonExistingUser = User.builder().id(2).name("Non-Existing User").email("nonexistent@example.com").build();
-		ResponseEntity<User> response = userController.updateUser(nonExistingUser);
+		ResponseEntity<User> response = (ResponseEntity<User>)userController.updateUser(nonExistingUser);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}

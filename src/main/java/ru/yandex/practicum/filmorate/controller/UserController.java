@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +38,10 @@ public class UserController {
 	}
 
 	@PutMapping
-	public ResponseEntity<User> updateUser(@Validated @RequestBody User updateUser) {
+	public ResponseEntity<?> updateUser(@Validated @RequestBody User updateUser) {
 		User actualUser = userStorage.updateUser(updateUser);
 		if (actualUser == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Или передать JSON с описанием ошибки.
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + updateUser.getId() + " not found"));
 		}
 		return ResponseEntity.ok(actualUser);
 	}
@@ -52,9 +53,9 @@ public class UserController {
 	}
 
 	@PutMapping("/{parentId}/friends/{childId}")
-	public ResponseEntity<Void> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+	public ResponseEntity<?> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
 		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
 		}
 		boolean success = userStorage.addFriend(parentId, childId);
 		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -63,7 +64,7 @@ public class UserController {
 	@DeleteMapping("/{parentId}/friends/{childId}")
 	public ResponseEntity<?> deleteFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
 		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Один из пользователей не найден."); // JSON или строка.
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
 		}
 		boolean success = userStorage.deleteFriend(parentId, childId);
 		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -71,7 +72,10 @@ public class UserController {
 
 
 	@GetMapping("/{parentId}/friends")
-	public ResponseEntity<List<User>> getFriends(@PathVariable @NotNull @Positive Integer parentId) {
+	public ResponseEntity<?> getFriends(@PathVariable @NotNull @Positive Integer parentId) {
+		if (!userStorage.existsById(parentId)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + parentId + " not found"));
+		}
 		List<User> friends = userStorage.getFriends(parentId);
 		return ResponseEntity.ok(friends);
 	}

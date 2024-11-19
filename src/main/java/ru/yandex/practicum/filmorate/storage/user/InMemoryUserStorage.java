@@ -31,10 +31,10 @@ public class InMemoryUserStorage implements UserStorage {
 	public User updateUser(User updateUser) {
 		if (usersCollection.containsKey(updateUser.getId())) {
 			usersCollection.put(updateUser.getId(), updateUser);
-			log.info("Обновлен пользователь с ID: {}", updateUser.getId());
+			log.info("Updated user with ID: {}", updateUser.getId());
 			return updateUser;
 		}
-		log.warn("Пользователь с ID {} не найден", updateUser.getId());
+		log.warn("User with ID {} not found", updateUser.getId());
 		return null;
 	}
 
@@ -104,7 +104,7 @@ public class InMemoryUserStorage implements UserStorage {
 
 	@Override
 	public boolean existsById(Integer parentId) {
-		return usersCollection.get(parentId) != null;
+		return usersCollection.containsKey(parentId);
 	}
 
 	private Integer getNewId() {
