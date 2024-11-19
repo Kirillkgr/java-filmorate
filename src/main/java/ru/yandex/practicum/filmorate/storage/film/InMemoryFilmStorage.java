@@ -74,8 +74,10 @@ public class InMemoryFilmStorage implements FilmStorage {
 		Film film = filmCollection.get(id);
 		if (film != null) {
 			film.getLikeUsers().add(userId);
+			log.info("Added like from user {} to film {}", userId, id);
 			return film;
 		}
+		log.info("Film with id {} not found", id);
 		return null;
 	}
 
@@ -92,35 +94,19 @@ public class InMemoryFilmStorage implements FilmStorage {
 	@Override
 	public List<Film> getPopularFilms(Integer count) {
 		if (!filmCollection.isEmpty()) {
-			return filmCollection.values().stream()
-					.sorted((f1, f2) -> Integer.compare(f2.getLikesIds().size(), f1.getLikesIds().size()))
-					.limit(count)
-					.collect(Collectors.toList());
+			return filmCollection.values().stream().sorted((f1, f2) -> Integer.compare(f2.getLikesIds().size(), f1.getLikesIds().size())).limit(count).collect(Collectors.toList());
 		}
 		return List.of();
 	}
 
 	public static FilmDto convertFilmToFilmDto(Film newFilmToSave) {
 		FilmDto filmDTO;
-		filmDTO = FilmDto.builder()
-				.id(newFilmToSave.getId())
-				.name(newFilmToSave.getName())
-				.description(newFilmToSave.getDescription())
-				.releaseDate(newFilmToSave.getReleaseDate())
-				.duration((int) newFilmToSave.getDuration().toMinutes())
-				.build();
+		filmDTO = FilmDto.builder().id(newFilmToSave.getId()).name(newFilmToSave.getName()).description(newFilmToSave.getDescription()).releaseDate(newFilmToSave.getReleaseDate()).duration((int) newFilmToSave.getDuration().toMinutes()).build();
 		return filmDTO;
 	}
 
 	private static Film convertFilmDtoToFilm(FilmDto newFilm) {
-		return Film
-				.builder()
-				.id(newFilm.getId())
-				.name(newFilm.getName())
-				.description(newFilm.getDescription())
-				.releaseDate(newFilm.getReleaseDate())
-				.duration(Duration.ofMinutes(newFilm.getDuration()))
-				.build();
+		return Film.builder().id(newFilm.getId()).name(newFilm.getName()).description(newFilm.getDescription()).releaseDate(newFilm.getReleaseDate()).duration(Duration.ofMinutes(newFilm.getDuration())).build();
 	}
 
 	public Film createFilm(FilmDto newFilm) {

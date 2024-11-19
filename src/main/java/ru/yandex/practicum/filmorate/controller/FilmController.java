@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -70,10 +71,11 @@ public class FilmController {
 
 	// new
 	@PutMapping(value = "/{filmId}/like/{userId}")
-	public ResponseEntity<Film> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+	public ResponseEntity<?> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
 		Film film = filmStorage.addLike(filmId, userId);
 		if (film == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("error", "Film with id " + filmId + " not found"));
 		}
 		return ResponseEntity.ok(film);
 	}
