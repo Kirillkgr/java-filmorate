@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,19 +36,19 @@ public class UserController {
 	@GetMapping()
 	public ResponseEntity<List<User>> getUsers() {
 		List<User> users = userStorage.getUsers();
-		if (users != null) {
+		if (!users.isEmpty()) {
 			return ResponseEntity.ok(users);
 		} else
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
-	@GetMapping(value = "/{id}")
-	public ResponseEntity<User> getUser(@PathVariable @NotNull @Positive Integer id) {
+	public ResponseEntity<?> getUser(@PathVariable @NotNull @Positive Integer id) {
 		User user = userStorage.getUser(id);
-		if (user != null) {
-			return ResponseEntity.ok(user);
-		} else
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		if (user == null) {
+			Map<String, String> error = Map.of("error", "User not found for id: " + id);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+		}
+		return ResponseEntity.ok(user);
 	}
 
 	@PutMapping

@@ -27,12 +27,12 @@ public class InMemoryUserStorage implements UserStorage {
 
 	@Override
 	public List<User> getUsers() {
-		if (!usersCollection.isEmpty()) {
-			log.info("Выдан список пользователей в количестве : {}", usersCollection.size());
-			return usersCollection.values().stream().toList();
-		}
-		log.info("В базе отсутствуют фильмы");
-		return null;
+
+		List<User> users = usersCollection.values().stream().toList();
+		if (users.isEmpty()) {
+			log.warn("Пользователи отсутствуют");
+		} else log.info("Выдан список пользователей в количестве : {}", usersCollection.size());
+		return users;
 	}
 
 	@Override
