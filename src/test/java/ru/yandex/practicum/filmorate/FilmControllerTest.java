@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +24,7 @@ class FilmControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		FilmStorage filmStorage = new InMemoryFilmStorage();
+		FilmStorage filmStorage = new InMemoryFilmStorage(new InMemoryUserStorage());
 		filmController = new FilmController(filmStorage);
 	}
 

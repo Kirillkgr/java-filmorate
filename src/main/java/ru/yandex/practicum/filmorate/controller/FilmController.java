@@ -81,10 +81,11 @@ public class FilmController {
 	}
 
 	@DeleteMapping(value = "/{filmId}/like/{userId}")
-	public ResponseEntity<Film> deleteLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+	public ResponseEntity<?> deleteLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
 		Film film = filmStorage.deleteLike(filmId, userId);
 		if (film == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(Map.of("error", "Film with or user not found"));
 		}
 		return ResponseEntity.ok(film);
 	}
