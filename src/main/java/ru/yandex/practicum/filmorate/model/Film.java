@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
 @Builder
@@ -44,10 +44,12 @@ public class Film {
 	@EqualsAndHashCode.Exclude
 	String description;
 
-	@NotNull(message = "Release date must not be null")
-	@PastOrPresent(message = "Release date must be in the past or present")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private LocalDate releaseDate;
+	@NotNull
+	@PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.")
+	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
+	@EqualsAndHashCode.Exclude
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	LocalDate releaseDate;
 
 	@NotNull
 	@EqualsAndHashCode.Exclude
