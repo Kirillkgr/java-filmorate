@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.DTO;
 
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,7 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
 @Getter
@@ -29,23 +26,21 @@ public class FilmDto {
 
 	Integer id;
 
-	@NotNull
-	@NotBlank
-	String name;
+	@NotNull(message = "Film name cannot be null")
+	private String name;
 
-	@NotNull
-	@Size(min = 1, max = 200)
-	@EqualsAndHashCode.Exclude
-	String description;
+	@NotNull(message = "Description cannot be null")
+	private String description;
 
-	@NotNull
-	@EqualsAndHashCode.Exclude
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	LocalDate releaseDate;
+	@NotNull(message = "Release date cannot be null")
+	@FutureOrPresent(message = "Release date must not be in the future")
+	private LocalDate releaseDate;
 
-	@NotNull
-	@EqualsAndHashCode.Exclude
-	@Positive
-	Integer duration;
+	@NotNull(message = "Duration cannot be null")
+	private Integer duration;
+
+	public FilmDto(String errorMessage) {
+		this.name = errorMessage;
+	}
 }
 

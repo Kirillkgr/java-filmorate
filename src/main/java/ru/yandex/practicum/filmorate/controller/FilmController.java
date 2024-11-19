@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,14 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -29,8 +23,8 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequestMapping("/films")
 public class FilmController {
-	final FilmStorage filmStorage;
 
+	final FilmStorage filmStorage;
 
 	@GetMapping
 	public ResponseEntity<List<Film>> getFilms() {
@@ -52,6 +46,10 @@ public class FilmController {
 
 	@PutMapping
 	public ResponseEntity<FilmDto> updateFilm(@Validated @RequestBody FilmDto updateFilm) {
+		// Проверка даты выпуска
+		if (updateFilm.getReleaseDate().isAfter(LocalDate.now())) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FilmDto("Invalid release date"));
+		}
 
 		FilmDto filmDto = filmStorage.updateFilm(updateFilm);
 
@@ -63,11 +61,16 @@ public class FilmController {
 
 	@PostMapping
 	public ResponseEntity<FilmDto> createFilm(@Validated @RequestBody FilmDto newFilm) {
+		// Проверка даты выпуска
+		if (newFilm.getReleaseDate().isAfter(LocalDate.now())) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new FilmDto("Invalid release date"));
+		}
+
 		newFilm = filmStorage.createFilm(newFilm);
 		return ResponseEntity.ok(newFilm);
 	}
 
-	// new
+	// Новый метод для добавления лайка
 	@PutMapping(value = "/{filmId}/like/{userId}")
 	public ResponseEntity<Film> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
 		Film film = filmStorage.addLike(filmId, userId);
@@ -94,5 +97,4 @@ public class FilmController {
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
-
 }
