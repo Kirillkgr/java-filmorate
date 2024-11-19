@@ -102,6 +102,11 @@ public class InMemoryUserStorage implements UserStorage {
 				.toList();
 	}
 
+	@Override
+	public boolean existsById(Integer parentId) {
+		return usersCollection.get(parentId) != null;
+	}
+
 	private Integer getNewId() {
 		return ++id;
 	}

@@ -39,7 +39,10 @@ public class UserController {
 	@PutMapping
 	public ResponseEntity<User> updateUser(@Validated @RequestBody User updateUser) {
 		User actualUser = userStorage.updateUser(updateUser);
-		return actualUser != null ? ResponseEntity.ok(actualUser) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		if (actualUser == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Или передать JSON с описанием ошибки.
+		}
+		return ResponseEntity.ok(actualUser);
 	}
 
 	@PostMapping
@@ -50,15 +53,22 @@ public class UserController {
 
 	@PutMapping("/{parentId}/friends/{childId}")
 	public ResponseEntity<Void> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 		boolean success = userStorage.addFriend(parentId, childId);
-		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	}
 
 	@DeleteMapping("/{parentId}/friends/{childId}")
-	public ResponseEntity<Void> deleteFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+	public ResponseEntity<?> deleteFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Один из пользователей не найден."); // JSON или строка.
+		}
 		boolean success = userStorage.deleteFriend(parentId, childId);
-		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	}
+
 
 	@GetMapping("/{parentId}/friends")
 	public ResponseEntity<List<User>> getFriends(@PathVariable @NotNull @Positive Integer parentId) {

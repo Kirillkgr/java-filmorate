@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
 import java.time.Duration;
@@ -45,7 +45,7 @@ public class Film {
 	String description;
 
 	@NotNull
-	@Past(message = "Дата релиза не может быть в будущем")
+	@PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.")
 	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
 	@EqualsAndHashCode.Exclude
 	@DateTimeFormat(pattern = "yyyy-MM-dd")

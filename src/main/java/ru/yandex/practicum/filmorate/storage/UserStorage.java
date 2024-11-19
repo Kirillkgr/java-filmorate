@@ -21,4 +21,6 @@ public interface UserStorage {
 	List<User> getCommonFriends(@NotNull @Positive Integer id, @NotNull @Positive Integer otherId);
 
 	List<User> getFriends(@NotNull @Positive Integer id);
+
+	boolean existsById(@NotNull @Positive Integer parentId);
 }
