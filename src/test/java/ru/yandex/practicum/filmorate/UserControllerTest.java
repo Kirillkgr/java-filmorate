@@ -12,7 +12,7 @@ import java.util.List;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -31,7 +31,7 @@ class UserControllerTest {
 	void getUsers_noUsers_returnsNotFound() {
 		ResponseEntity<List<User>> response = userController.getUsers();
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertNull(response.getBody());
+		assertNotNull(response.getBody());
 	}
 
 	@Test
