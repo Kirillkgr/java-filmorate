@@ -1,94 +1,88 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import java.util.Map;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
-import java.util.HashMap;
+import java.util.Map;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-	final Map<Integer, User> usersCollection;
-	Integer id;
 
-	public UserController() {
-		usersCollection = new HashMap<>();
-	}
+	final UserStorage userStorage;
 
-	@GetMapping()
+	@GetMapping
 	public ResponseEntity<List<User>> getUsers() {
-		if (!usersCollection.isEmpty()) {
-			log.info("Выдан список пользователей в количестве : {}", usersCollection.size());
-			return ResponseEntity.ok(usersCollection.values().stream().toList());
-		}
-		log.info("В базе отсутствуют фильмы");
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		List<User> users = userStorage.getUsers();
+		return users.isEmpty() ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(users);
 	}
 
-	@GetMapping(value = "/{id}")
-	public ResponseEntity<User> getUser(@Validated @PathVariable Integer id) {
-		if (usersCollection.containsKey(id)) {
-			log.info("Получен пользователь : {}", usersCollection.get(id).getName());
-			return ResponseEntity.ok(usersCollection.get(id));
-		}
-		log.info("Не найден пользователь : {}", id);
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	@GetMapping("/{id}")
+	public ResponseEntity<User> getUser(@PathVariable @NotNull @Positive Integer id) {
+		User user = userStorage.getUser(id);
+		return user != null ? ResponseEntity.ok(user) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 
 	@PutMapping
-	public ResponseEntity<User> updateUser(@Validated @RequestBody User updateUser) {
-		if (usersCollection.containsKey(updateUser.getId())) {
-			usersCollection.put(updateUser.getId(), updateUser);
-			log.info("Обновлен пользователь: {}", updateUser.getName());
-			return ResponseEntity.ok(updateUser);
-		} else {
-			log.warn("Не найден пользователь с id: {}", updateUser.getId());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updateUser);
+	public ResponseEntity<?> updateUser(@Validated @RequestBody User updateUser) {
+		User actualUser = userStorage.updateUser(updateUser);
+		if (actualUser == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + updateUser.getId() + " not found"));
 		}
+		return ResponseEntity.ok(actualUser);
 	}
-
 
 	@PostMapping
 	public ResponseEntity<User> createUser(@Validated @RequestBody User newUser) {
-		// Устанавливаем имя пользователя по умолчанию, если оно не указано
-		if (newUser.getName() == null || newUser.getName().isBlank()) {
-			newUser.setName(newUser.getLogin());
-		}
-
-		// Проверяем, существует ли пользователь с таким ID
-		User userExist = newUser.getId() != null ? usersCollection.get(newUser.getId()) : null;
-		if (userExist != null) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(newUser);
-		}
-
-		// Назначаем ID, если он не задан, и добавляем пользователя в коллекцию
-		newUser.setId(getNewId());
-		usersCollection.put(newUser.getId(), newUser);
-		log.info("Добавлен пользователь: {}", newUser);
-		return ResponseEntity.ok(newUser);
+		User user = userStorage.createUser(newUser);
+		return user != null ? ResponseEntity.status(HttpStatus.CREATED).body(user) : ResponseEntity.status(HttpStatus.CONFLICT).build();
 	}
 
-	private Integer getNewId() {
-		if (id == null) {
-			id = 0;
+	@PutMapping("/{parentId}/friends/{childId}")
+	public ResponseEntity<?> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
 		}
-		return ++id;
+		boolean success = userStorage.addFriend(parentId, childId);
+		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	}
 
+	@DeleteMapping("/{parentId}/friends/{childId}")
+	public ResponseEntity<?> deleteFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
+		}
+		boolean success = userStorage.deleteFriend(parentId, childId);
+		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	}
+
+
+	@GetMapping("/{parentId}/friends")
+	public ResponseEntity<?> getFriends(@PathVariable @NotNull @Positive Integer parentId) {
+		if (!userStorage.existsById(parentId)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + parentId + " not found"));
+		}
+		List<User> friends = userStorage.getFriends(parentId);
+		return ResponseEntity.ok(friends);
+	}
+
+	@GetMapping("/{parentId}/friends/common/{otherId}")
+	public ResponseEntity<List<User>> getCommonFriends(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer otherId) {
+		List<User> friends = userStorage.getCommonFriends(parentId, otherId);
+		return ResponseEntity.ok(friends);
+	}
 }

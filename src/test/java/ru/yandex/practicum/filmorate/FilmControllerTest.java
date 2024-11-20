@@ -12,6 +12,9 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +24,8 @@ class FilmControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		filmController = new FilmController();
+		FilmStorage filmStorage = new InMemoryFilmStorage(new InMemoryUserStorage());
+		filmController = new FilmController(filmStorage);
 	}
 
 	@Test
@@ -45,7 +49,7 @@ class FilmControllerTest {
 
 	@Test
 	void getFilm_existingFilm_returnsFilm() {
-		FilmDto testFilm = FilmDto.builder().name("Test Film").description("test description").duration(10).releaseDate(LocalDate.now()).build();
+		FilmDto testFilm = FilmDto.builder().id(1).name("Test Film").description("test description").duration(10).releaseDate(LocalDate.now()).build();
 
 
 		filmController.createFilm(testFilm);
@@ -88,7 +92,7 @@ class FilmControllerTest {
 	@Test
 	void createFilm_newFilm_createsFilm() {
 		FilmDto newFilm = FilmDto.builder().name("New Film").duration(30).releaseDate(LocalDate.now()).build();
-		ResponseEntity<FilmDto> response = (ResponseEntity<FilmDto>) filmController.createFilm(newFilm);
+		ResponseEntity<FilmDto> response = filmController.createFilm(newFilm);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());

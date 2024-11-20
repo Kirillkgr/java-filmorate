@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +16,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
 
 @Getter
 @Setter
@@ -22,7 +24,7 @@ import org.springframework.validation.annotation.Validated;
 @ToString
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Validated
+
 public class User {
 
 	Integer id;
@@ -32,13 +34,24 @@ public class User {
 	String email;
 
 	@NotNull
+	@NotBlank
 	String login;
 
 	String name;
 
 	@NotNull
-	@Past
 	@EqualsAndHashCode.Exclude
+	@Past
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	LocalDate birthday;
+
+	@ToString.Exclude
+	Set<Integer> friendsIds;
+
+	public Set<Integer> getFriends() {
+		if (friendsIds == null) {
+			friendsIds = new HashSet<>();
+		}
+		return friendsIds;
+	}
 }

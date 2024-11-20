@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.DTO;
 
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -26,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 public class FilmDto {
+	private static final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
 	Integer id;
 
@@ -39,7 +42,7 @@ public class FilmDto {
 	String description;
 
 	@NotNull
-	@EqualsAndHashCode.Exclude
+	@PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	LocalDate releaseDate;
 
@@ -47,5 +50,10 @@ public class FilmDto {
 	@EqualsAndHashCode.Exclude
 	@Positive
 	Integer duration;
+
+	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
+	public boolean isValidReleaseDate() {
+		return !releaseDate.isBefore(LocalDate.of(1895, 12, 28));
+	}
 }
 
