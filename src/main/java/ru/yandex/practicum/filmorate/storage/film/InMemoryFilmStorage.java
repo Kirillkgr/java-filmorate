@@ -117,7 +117,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	public Film createFilm(FilmDto newFilm) {
 		int newId = getNextId(); // Method that returns the next available ID
-		Film film = new Film(newId, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), Duration.ofMinutes(newFilm.getDuration()), new HashSet<>());
+		Film film = new Film(newId, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), Duration.ofMinutes(newFilm.getDuration()), new HashSet<>(),new HashSet<>(), Film.MPARating.G);
 		filmCollection.put(newId, film);
 		return film;
 	}

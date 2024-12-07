@@ -1,26 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
-
-import java.time.Duration;
-import java.time.LocalDate;
-
-import java.util.HashSet;
-import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.validation.constraints.*;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Builder
 @Getter
@@ -57,9 +46,16 @@ public class Film {
 
 	Set<Integer> likesIds;
 
+	@NotNull
+	@Size(min = 1, message = "Фильм должен иметь хотя бы один жанр.")
+	Set<String> genres = new HashSet<>();
+
+	@NotNull(message = "Рейтинг не может быть пустым.")
+	MPARating mpaRating;
+
 	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
 	public boolean isValidReleaseDate() {
-		return !releaseDate.isBefore(LocalDate.of(1895, 12, 28));
+		return !releaseDate.isBefore(RELEASE_DATE);
 	}
 
 	public Set<Integer> getLikeUsers() {
@@ -67,5 +63,9 @@ public class Film {
 			likesIds = new HashSet<>();
 		}
 		return likesIds;
+	}
+
+	public enum MPARating {
+		G, PG, PG_13, R, NC_17
 	}
 }
