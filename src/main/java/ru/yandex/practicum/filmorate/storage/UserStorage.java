@@ -2,8 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import java.util.List;
 import ru.yandex.practicum.filmorate.model.User;
+
+import java.util.List;
 
 public interface UserStorage {
 	List<User> getUsers();

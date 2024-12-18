@@ -1,57 +1,49 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.FieldDefaults;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
-@ToString
+@Entity
+@NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-
+@Table(name = "USERS")
 public class User {
+    @Id
+    @Column(name = "ID", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	Integer id;
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "NAME", nullable = false)
+    private String name;
 
-	@NotNull
-	@Email
-	String email;
+    @Size(max = 255)
+    @NotNull
+    @Email
+    @Column(name = "EMAIL", nullable = false)
+    private String email;
 
-	@NotNull
-	@NotBlank
-	String login;
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "LOGIN", nullable = false, length = 50)
+    private String login;
 
-	String name;
+    @NotNull
+    @EqualsAndHashCode.Exclude
+    @Past
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "BIRTHDAY", nullable = false)
+    private LocalDate birthday;
 
-	@NotNull
-	@EqualsAndHashCode.Exclude
-	@Past
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	LocalDate birthday;
-
-	@ToString.Exclude
-	Set<Integer> friendsIds;
-
-	public Set<Integer> getFriends() {
-		if (friendsIds == null) {
-			friendsIds = new HashSet<>();
-		}
-		return friendsIds;
-	}
 }

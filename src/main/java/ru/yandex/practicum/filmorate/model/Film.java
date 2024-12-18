@@ -1,71 +1,60 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-
-import java.time.Duration;
-import java.time.LocalDate;
-
-import java.util.HashSet;
-import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
+
+@Entity
 @Builder
 @Getter
 @Setter
-@EqualsAndHashCode
 @ToString
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
+@NoArgsConstructor
+@Table(name = "FILMS")
 public class Film {
-	private static final LocalDate RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    @Id
+    @Column(name = "ID", nullable = false)
+    private Integer id;
 
-	Integer id;
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "NAME", nullable = false)
+    private String name;
 
-	@NotNull
-	@NotBlank
-	String name;
+    @NotNull
+    @Size(min = 1, max = 200)
+    @Column(name = "DESCRIPTION", nullable = false, length = 200)
+    private String description;
 
-	@NotNull
-	@Size(min = 1, max = 200)
-	@EqualsAndHashCode.Exclude
-	String description;
+    @NotNull
+    @PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.")
+    @AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
+    @EqualsAndHashCode.Exclude
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "RELEASE_DATE", nullable = false)
+    private LocalDate releaseDate;
 
-	@NotNull
-	@PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.")
-	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
-	@EqualsAndHashCode.Exclude
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate releaseDate;
+    @NotNull
+    @EqualsAndHashCode.Exclude
+    @Column(name = "DURATION", nullable = false)
+    private Integer duration;
 
-	@NotNull
-	@EqualsAndHashCode.Exclude
-	Duration duration;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "RATING_ID")
+    private Rating rating;
 
-	Set<Integer> likesIds;
-
-	@AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
-	public boolean isValidReleaseDate() {
-		return !releaseDate.isBefore(LocalDate.of(1895, 12, 28));
-	}
-
-	public Set<Integer> getLikeUsers() {
-		if (likesIds == null) {
-			likesIds = new HashSet<>();
-		}
-		return likesIds;
-	}
 }
