@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.DTO.FriendDTO;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -67,39 +68,25 @@ public class InMemoryUserStorage implements UserStorage {
 	}
 
 	@Override
-	public boolean deleteFriend(Integer parentId, Integer childId) {
+	public void deleteFriend(Integer parentId, Integer childId) {
 		User parent = usersCollection.get(parentId);
 		User child = usersCollection.get(childId);
 		if (parent == null || child == null) {
-			return false;
+			return;
 		}
 		parent.getFriends().remove(childId);
 		child.getFriends().remove(parentId);
 		log.info("Пользователи {} и {} больше не друзья", parentId, childId);
-		return true;
+    }
+
+	@Override
+	public List<FriendDTO> getCommonFriends(Integer parentId, Integer childId) {
+		return null;
 	}
 
 	@Override
-	public List<User> getCommonFriends(Integer parentId, Integer childId) {
-		User parent = usersCollection.get(parentId);
-		User child = usersCollection.get(childId);
-		if (parent == null || child == null) {
-			return List.of();
-		}
-		Set<Integer> commonFriends = new HashSet<>(parent.getFriends());
-		commonFriends.retainAll(child.getFriends());
-		return commonFriends.stream().map(usersCollection::get).toList();
-	}
-
-	@Override
-	public List<User> getFriends(Integer id) {
-		User user = usersCollection.get(id);
-		if (user == null) {
-			return List.of();
-		}
-		return user.getFriends().stream()
-				.map(usersCollection::get)
-				.toList();
+	public List<FriendDTO> getFriends(Integer id) {
+		return null;
 	}
 
 	@Override

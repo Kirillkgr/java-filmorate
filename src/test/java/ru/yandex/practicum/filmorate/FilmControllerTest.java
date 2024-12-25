@@ -54,7 +54,7 @@ class FilmControllerTest {
 
 		filmController.createFilm(testFilm);
 
-		ResponseEntity<Film> response = filmController.getFilm(1);
+		ResponseEntity<FilmDto> response = filmController.getFilm(1);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(testFilm.getName(), response.getBody().getName());
@@ -62,7 +62,7 @@ class FilmControllerTest {
 
 	@Test
 	void getFilm_nonExistingFilm_returnsNotFound() {
-		ResponseEntity<Film> response = filmController.getFilm(1);
+		ResponseEntity<FilmDto> response = filmController.getFilm(1);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
 	}
@@ -75,7 +75,7 @@ class FilmControllerTest {
 		ResponseEntity<FilmDto> response = filmController.updateFilm(testFilm);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 
-		ResponseEntity<Film> getFilmResponse = filmController.getFilm(1);
+		ResponseEntity<FilmDto> getFilmResponse = filmController.getFilm(1);
 		assertEquals("Updated Film", Objects.requireNonNull(getFilmResponse.getBody()).getName());
 	}
 

@@ -11,6 +11,8 @@ public interface FilmStorage {
 
 	FilmDto updateFilm(FilmDto updateFilm);
 
+	boolean existsById(Integer id);
+
 	Film addLike(Integer id, Integer userId);
 
 	Film deleteLike(Integer filmId, Integer userId);

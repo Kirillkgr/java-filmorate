@@ -1,11 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -24,12 +20,10 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	final Map<Integer, Film> filmCollection;
 	private final InMemoryUserStorage inMemoryUserStorage;
-	Integer id;
 
-	public InMemoryFilmStorage(InMemoryUserStorage inMemoryUserStorage) {
+    public InMemoryFilmStorage(InMemoryUserStorage inMemoryUserStorage) {
 		filmCollection = new HashMap<>();
-		id = 0;
-		this.inMemoryUserStorage = inMemoryUserStorage;
+        this.inMemoryUserStorage = inMemoryUserStorage;
 	}
 
 
@@ -74,6 +68,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 	}
 
 	@Override
+	public boolean existsById(Integer id) {
+        return filmCollection.containsKey(id);
+    }
+
+	@Override
 	public Film addLike(Integer id, Integer userId) {
 		Film film = filmCollection.get(id);
 		User user = inMemoryUserStorage.getUser(userId);
@@ -107,7 +106,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	public static FilmDto convertFilmToFilmDto(Film newFilmToSave) {
 		FilmDto filmDTO;
-		filmDTO = FilmDto.builder().id(newFilmToSave.getId()).name(newFilmToSave.getName()).description(newFilmToSave.getDescription()).releaseDate(newFilmToSave.getReleaseDate()).duration((int) newFilmToSave.getDuration().toMinutes()).build();
+		filmDTO = FilmDto.builder()
+				.id(newFilmToSave.getId())
+				.name(newFilmToSave.getName())
+				.description(newFilmToSave.getDescription())
+				.releaseDate(newFilmToSave.getReleaseDate())
+				.duration((int) newFilmToSave.getDuration().toMinutes())
+				.rating(newFilmToSave.getRating())
+				.genres(newFilmToSave.getGenres()).build();
 		return filmDTO;
 	}
 
@@ -117,7 +123,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	public Film createFilm(FilmDto newFilm) {
 		int newId = getNextId(); // Method that returns the next available ID
-		Film film = new Film(newId, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), Duration.ofMinutes(newFilm.getDuration()), new HashSet<>());
+		Film film = new Film(newId, newFilm.getName(), newFilm.getDescription(), newFilm.getReleaseDate(), Duration.ofMinutes(newFilm.getDuration()), new LinkedHashSet<>());
 		filmCollection.put(newId, film);
 		return film;
 	}

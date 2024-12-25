@@ -2,16 +2,20 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
+import ru.yandex.practicum.filmorate.DTO.FriendDTO;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -19,70 +23,87 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Validated
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-	final UserStorage userStorage;
+    @Qualifier(value = "userDbStorage")
+    final UserStorage userStorage;
 
-	@GetMapping
-	public ResponseEntity<List<User>> getUsers() {
-		List<User> users = userStorage.getUsers();
-		return users.isEmpty() ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(users);
-	}
+    public UserController(@Qualifier("userDbStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
-	@GetMapping("/{id}")
-	public ResponseEntity<User> getUser(@PathVariable @NotNull @Positive Integer id) {
-		User user = userStorage.getUser(id);
-		return user != null ? ResponseEntity.ok(user) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	}
+    @GetMapping
+    public ResponseEntity<List<User>> getUsers() {
+        List<User> users = userStorage.getUsers();
+        return users.isEmpty() ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.ok(users);
+    }
 
-	@PutMapping
-	public ResponseEntity<?> updateUser(@Validated @RequestBody User updateUser) {
-		User actualUser = userStorage.updateUser(updateUser);
-		if (actualUser == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + updateUser.getId() + " not found"));
-		}
-		return ResponseEntity.ok(actualUser);
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable @NotNull @Positive Integer id) {
+        User user = userStorage.getUser(id);
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 
-	@PostMapping
-	public ResponseEntity<User> createUser(@Validated @RequestBody User newUser) {
-		User user = userStorage.createUser(newUser);
-		return user != null ? ResponseEntity.status(HttpStatus.CREATED).body(user) : ResponseEntity.status(HttpStatus.CONFLICT).build();
-	}
+    @PutMapping
+    public ResponseEntity<?> updateUser(@Validated @RequestBody User updateUser) {
+        User actualUser = userStorage.updateUser(updateUser);
+        if (actualUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + updateUser.getId() + " not found"));
+        }
+        return ResponseEntity.ok(actualUser);
+    }
 
-	@PutMapping("/{parentId}/friends/{childId}")
-	public ResponseEntity<?> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
-		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
-		}
-		boolean success = userStorage.addFriend(parentId, childId);
-		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	}
+    @PostMapping
+    public ResponseEntity<User> createUser(@Validated @RequestBody User newUser) {
+        User user = userStorage.createUser(newUser);
+        return user != null ? ResponseEntity.status(HttpStatus.CREATED).body(user) : ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
 
-	@DeleteMapping("/{parentId}/friends/{childId}")
-	public ResponseEntity<?> deleteFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
-		if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
-		}
-		boolean success = userStorage.deleteFriend(parentId, childId);
-		return success ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	}
+    @PutMapping("/{parentId}/friends/{childId}")
+    public ResponseEntity<?> addFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+        if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
+        }
+        boolean success = userStorage.addFriend(parentId, childId);
+        if (success) {
+            List<FriendDTO> friends = userStorage.getFriends(parentId);
+            return ResponseEntity.ok(friends);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
-	@GetMapping("/{parentId}/friends")
-	public ResponseEntity<?> getFriends(@PathVariable @NotNull @Positive Integer parentId) {
-		if (!userStorage.existsById(parentId)) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + parentId + " not found"));
-		}
-		List<User> friends = userStorage.getFriends(parentId);
-		return ResponseEntity.ok(friends);
-	}
+    @DeleteMapping("/{parentId}/friends/{childId}")
+    public ResponseEntity<?> deleteFriend(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer childId) {
+        if (!userStorage.existsById(parentId) || !userStorage.existsById(childId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User(s) not found: parentId=" + parentId + ", childId=" + childId));
+        }
+        userStorage.deleteFriend(parentId, childId);
+        return ResponseEntity.noContent().build();
 
-	@GetMapping("/{parentId}/friends/common/{otherId}")
-	public ResponseEntity<List<User>> getCommonFriends(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer otherId) {
-		List<User> friends = userStorage.getCommonFriends(parentId, otherId);
-		return ResponseEntity.ok(friends);
-	}
+    }
+
+
+    @GetMapping("/{parentId}/friends")
+    public ResponseEntity<?> getFriends(@PathVariable @NotNull @Positive Integer parentId) {
+        if (!userStorage.existsById(parentId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + parentId + " not found"));
+        }
+        List<FriendDTO> friends = userStorage.getFriends(parentId);
+        List<User> friendsUser = friends.stream()
+                .map(friend -> userStorage.getUser(friend.getId()))
+                .collect(Collectors.toList());
+
+
+        return ResponseEntity.ok(friendsUser);
+    }
+
+    @GetMapping("/{parentId}/friends/common/{otherId}")
+    public ResponseEntity<List<FriendDTO>> getCommonFriends(@PathVariable @NotNull @Positive Integer parentId, @PathVariable @NotNull @Positive Integer otherId) {
+        List<FriendDTO> friends = userStorage.getCommonFriends(parentId, otherId);
+        return ResponseEntity.ok(friends);
+    }
+
 }
