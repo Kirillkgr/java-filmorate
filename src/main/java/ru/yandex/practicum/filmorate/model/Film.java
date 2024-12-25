@@ -1,24 +1,28 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.PastOrPresent;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 import java.time.LocalDate;
-
-import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-
-
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.format.annotation.DateTimeFormat;
+import java.util.Set;
 
 @Builder
 @Getter

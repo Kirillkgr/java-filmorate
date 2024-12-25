@@ -10,10 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-
-import java.time.LocalDate;
-import java.util.LinkedHashSet;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +22,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.model.GenreModel;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
+
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
 
 @Getter
 @Setter

@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate.repository.Impl;
 
-import ru.yandex.practicum.filmorate.repository.LikeRepository;
-
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.FilmLike;
+import ru.yandex.practicum.filmorate.repository.LikeRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +20,7 @@ public class LikeServiceImpl implements LikeRepository {
 
 
     JdbcTemplate jdbcTemplate;
- 
+
 
     @Override
     public boolean existsById(Integer id) {
@@ -36,6 +34,7 @@ public class LikeServiceImpl implements LikeRepository {
         String sql = "SELECT * FROM film_likes WHERE film_id = ?";
         return jdbcTemplate.query(sql, new FilmLikeRowMapper(), filmId);
     }
+
     @Override
     public boolean existsByFilmId(Integer filmId) {
         String sql = "SELECT COUNT(*) FROM film_likes WHERE film_id = ? ";

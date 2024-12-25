@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -10,13 +7,17 @@ import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
-
-import java.util.List;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class FilmControllerTest {
 

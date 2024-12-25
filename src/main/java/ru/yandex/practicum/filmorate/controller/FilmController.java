@@ -1,11 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import java.util.Map;
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage.convertFilmToFilmDto;
 
