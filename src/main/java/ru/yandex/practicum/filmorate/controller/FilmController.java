@@ -72,6 +72,7 @@ public class FilmController {
     public ResponseEntity<FilmDto> createFilm(@Validated @RequestBody FilmDto newFilm) {
 
         Film film = filmStorage.createFilm(newFilm);
+        if(null == film) return ResponseEntity.status(400).body(new FilmDto());
         newFilm = convertFilmToFilmDto(film);
         return ResponseEntity.ok(newFilm);
     }

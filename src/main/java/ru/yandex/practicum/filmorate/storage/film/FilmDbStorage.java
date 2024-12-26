@@ -98,56 +98,62 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(FilmDto newFilm) {
-
-        if (newFilm.getGenres() != null && newFilm.getGenres().getFirst().getId() != null) {
-            LinkedHashSet<GenreModel> genreModels = new LinkedHashSet<>();
-            for (GenreModel model : newFilm.getGenres()) {
-                if (model.getId() == null)
-                    continue;
-                Genre genre = Genre.forValues(model.getId());
-                genreModels.add(GenreModel.builder().id(Objects.requireNonNull(genre).getId()).name(genre.name()).build());
-            }
-            newFilm.setGenres(genreModels);
-        }
-
-        LinkedHashSet<GenreModel> genres = new LinkedHashSet<>();
-        if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
-            for (GenreModel genre : newFilm.getGenres()) {
-                if (!genresService.existsById(genre.getId())) {
-                    genre = genresService.createGenre(genre);
-                }
-                genres.add(genre);
-            }
-            newFilm.setGenres(genres);
-
-        }
-        String sql = "INSERT INTO films (name, description, release_date, duration, rating_id) VALUES (?, ?, ?, ?, ?)";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setString(1, newFilm.getName());
-            ps.setString(2, newFilm.getDescription());
-            ps.setDate(3, Date.valueOf(newFilm.getReleaseDate()));
-            ps.setInt(4, newFilm.getDuration());
-            ps.setInt(5, newFilm.getRating() != null ? newFilm.getRating().getId() : 0);
-            return ps;
-        }, keyHolder);
-
-
-        if (keyHolder.getKey() != null) {
-            newFilm.setId(keyHolder.getKey().intValue());
-        } else {
-            throw new IllegalStateException("Не удалось сгенерировать ключ для нового фильма");
-        }
-        saveGenres(genres, newFilm.getId());
-        Film film;
         try {
-            film = convertFilmDtoToFilm(newFilm);
-            return film;
+            if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty() && newFilm.getGenres().getFirst().getId() != null) {
+                LinkedHashSet<GenreModel> genreModels = new LinkedHashSet<>();
+                for (GenreModel model : newFilm.getGenres()) {
+                    if (model.getId() == null) continue;
+
+                    Genre genre = Genre.forValues(model.getId());
+                    if (genre == null) {
+                        log.error("Genre is null for id: {}", model.getId());
+                        return null;
+                    }
+                    // Логирование жанра для отладки
+                    System.out.println("Processing genre: " + genre);
+
+                    // Добавляем жанр в набор genreModels
+                    genreModels.add(GenreModel.builder().id(genre.getId()).name(genre.name()).build());
+                }
+                newFilm.setGenres(genreModels);
+            }
+
+            LinkedHashSet<GenreModel> genres = new LinkedHashSet<>();
+            if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
+                for (GenreModel genre : newFilm.getGenres()) {
+                    if (!genresService.existsById(genre.getId())) {
+                        genre = genresService.createGenre(genre);
+                    }
+                    genres.add(genre);
+                }
+                newFilm.setGenres(genres);
+            }
+
+            String sql = "INSERT INTO films (name, description, release_date, duration, rating_id) VALUES (?, ?, ?, ?, ?)";
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+                ps.setString(1, newFilm.getName());
+                ps.setString(2, newFilm.getDescription());
+                ps.setDate(3, Date.valueOf(newFilm.getReleaseDate()));
+                ps.setInt(4, newFilm.getDuration());
+                ps.setInt(5, newFilm.getRating() != null ? newFilm.getRating().getId() : 0);
+                return ps;
+            }, keyHolder);
+
+            if (keyHolder.getKey() != null) {
+                newFilm.setId(keyHolder.getKey().intValue());
+            } else {
+                throw new IllegalStateException("Не удалось сгенерировать ключ для нового фильма");
+            }
+
+            saveGenres(genres, newFilm.getId());
+            return convertFilmDtoToFilm(newFilm);
+
         } catch (Exception e) {
-           log.error(e.getMessage());
+            log.error("Error creating film: {}", e.getMessage());
         }
+
         return null;
     }
 
