@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.springframework.validation.annotation.Validated;
+import ru.yandex.practicum.filmorate.Enums.Genre;
 
 @Builder
 @Getter

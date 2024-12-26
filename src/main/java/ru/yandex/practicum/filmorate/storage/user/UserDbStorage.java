@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,6 +18,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Repository
 @Qualifier("userDbStorage")
 public class UserDbStorage implements UserStorage {
@@ -93,62 +95,13 @@ public class UserDbStorage implements UserStorage {
         return true;
     }
 
-
-    public boolean acceptFriendship(Integer id, Integer friendId) {
-        try {
-            String checkSql = "SELECT COUNT(*) FROM friendship WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?) AND status like '%pending%'";
-            Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, id, friendId, friendId, id);
-
-            if (count != null && count == 2) {
-                // Обновляем статус на "accepted" для обеих записей
-                String updateSql = "UPDATE friendship SET status = 'accepted' WHERE (user_id = ? AND friend_id = ?) OR (friend_id = ? AND user_id = ?)";
-                jdbcTemplate.update(updateSql, id, friendId, friendId, id);
-                System.out.println("Friendship accepted: userId=" + id + ", friendId=" + friendId);
-                return true;
-            } else {
-                System.out.println("Friendship not found or not both pending: userId=" + id + ", friendId=" + friendId);
-                return false;
-            }
-        } catch (Exception e) {
-            System.err.println("Error accepting friendship: userId=" + id + ", friendId=" + friendId);
-            e.printStackTrace();
-            return false;
-        }
-    }
-//    @Override
-//    public boolean addFriend(Integer id, Integer friendId) {
-//        try {
-//            // Проверяем, существует ли уже запись о дружбе с нужными статусами
-//            String checkSql = "SELECT COUNT(*) FROM friendship WHERE user_id = ? AND friend_id = ?";
-//            Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, id, friendId);
-//
-//            if (count != null && count > 0) {
-//                // Запись существует, ничего не делаем
-//                System.out.println("Friendship already exists: userId=" + id + ", friendId=" + friendId);
-//                return true;
-//            } else {
-//                // Вставляем новую запись с "pending" статусом только для user1 -> user2
-//                String insertSql = "INSERT INTO friendship (user_id, friend_id, status) VALUES (?, ?, 'pending')";
-//                jdbcTemplate.update(insertSql, id, friendId);
-//                System.out.println("Friendship added: userId=" + id + ", friendId=" + friendId + ", status=pending");
-//            }
-//        } catch (Exception e) {
-//            System.err.println("Error adding friend: userId=" + id + ", friendId=" + friendId);
-//            e.printStackTrace();
-//            return false;
-//        }
-//
-//        return true;
-//    }
-
     @Override
     public void deleteFriend(Integer id, Integer friendId) {
         String sql = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
         try {
-            int rows = jdbcTemplate.update(sql, id, friendId);
+            jdbcTemplate.update(sql, id, friendId);
         } catch (Exception e) {
-            System.err.println("Error deleting friend: userId=" + id + ", friendId=" + friendId);
-            e.printStackTrace();
+            log.error("Error deleting friendship: {}", e.getMessage(), e);
         }
     }
 
@@ -163,12 +116,6 @@ public class UserDbStorage implements UserStorage {
             friendDTO.setStatus(rs.getString("status"));
             return friendDTO;
         }, id);
-    }
-
-
-    private String getFriendshipStatus(Integer userId, Integer friendId) {
-        String sql = "SELECT status FROM friendship WHERE user_id = ? AND friend_id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{userId, friendId}, String.class);
     }
 
     @Override
@@ -191,7 +138,7 @@ public class UserDbStorage implements UserStorage {
     public boolean existsById(Integer id) {
         String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
-        return count != null && count > 0;
+        return count > 0;
     }
 
     private static class UserRowMapper implements RowMapper<User> {

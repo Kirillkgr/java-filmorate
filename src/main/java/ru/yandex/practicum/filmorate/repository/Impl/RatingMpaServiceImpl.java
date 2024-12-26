@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
+import ru.yandex.practicum.filmorate.Enums.RatingMpa;
 import ru.yandex.practicum.filmorate.repository.RatingRepository;
 
 import java.util.ArrayList;

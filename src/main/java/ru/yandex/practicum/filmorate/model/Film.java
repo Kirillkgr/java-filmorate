@@ -17,6 +17,7 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
+import ru.yandex.practicum.filmorate.Enums.RatingMpa;
 
 import java.time.Duration;
 import java.time.LocalDate;

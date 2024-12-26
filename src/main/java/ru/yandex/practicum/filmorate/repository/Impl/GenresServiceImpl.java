@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.Enums.Genre;
 import ru.yandex.practicum.filmorate.repository.GenresRepository;
 
 import java.util.LinkedHashSet;

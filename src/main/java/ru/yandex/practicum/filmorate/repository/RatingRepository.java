@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.repository;
 
-import ru.yandex.practicum.filmorate.model.RatingMpa;
+import ru.yandex.practicum.filmorate.Enums.RatingMpa;
 
 import java.util.List;
 

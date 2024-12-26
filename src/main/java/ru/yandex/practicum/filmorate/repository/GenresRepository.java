@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.repository;
 
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.Enums.Genre;
 
 import java.util.Set;
 

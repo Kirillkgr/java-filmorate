@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.Enums.Genre;
 import ru.yandex.practicum.filmorate.model.GenreModel;
 
 import java.sql.PreparedStatement;
