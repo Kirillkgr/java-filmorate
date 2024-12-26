@@ -45,11 +45,7 @@ public class LikeServiceImpl implements LikeRepository {
     private static class FilmLikeRowMapper implements RowMapper<FilmLike> {
         @Override
         public FilmLike mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return FilmLike.builder()
-                    .id(rs.getInt("id"))
-                    .filmId(rs.getInt("film_id"))
-                    .userId(rs.getInt("user_id"))
-                    .build();
+            return FilmLike.builder().id(rs.getInt("id")).filmId(rs.getInt("film_id")).userId(rs.getInt("user_id")).build();
         }
     }
 }

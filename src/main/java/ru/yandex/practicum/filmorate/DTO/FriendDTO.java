@@ -10,7 +10,7 @@ public class FriendDTO {
     private String name;
     private String status;
 
-    public FriendDTO(int id, String name,String status) {
+    public FriendDTO(int id, String name, String status) {
         this.id = id;
         this.name = name;
         this.status = status;

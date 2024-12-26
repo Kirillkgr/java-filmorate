@@ -10,11 +10,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RatingMpa {
-    G(1, "G"),
-    PG(2, "PG"),
-    PG13(3, "PG-13"),
-    R(4, "R"),
-    NC17(5, "NC-17");
+    G(1, "G"), PG(2, "PG"), PG13(3, "PG-13"), R(4, "R"), NC17(5, "NC-17");
 
     private final int id;
     @Getter

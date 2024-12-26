@@ -53,8 +53,7 @@ public class FilmController {
     @GetMapping("/{id}")
     public ResponseEntity<FilmDto> getFilm(@PathVariable Integer id) {
         Film filmCollection = filmStorage.getFilm(id);
-        if (filmCollection == null)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        if (filmCollection == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         FilmDto newFilm = convertFilmToFilmDto(filmCollection);
         return ResponseEntity.ok(newFilm);
     }
@@ -72,7 +71,7 @@ public class FilmController {
     public ResponseEntity<FilmDto> createFilm(@Validated @RequestBody FilmDto newFilm) {
 
         Film film = filmStorage.createFilm(newFilm);
-        if(null == film) return ResponseEntity.status(400).body(new FilmDto());
+        if (null == film) return ResponseEntity.status(400).body(new FilmDto());
         newFilm = convertFilmToFilmDto(film);
         return ResponseEntity.ok(newFilm);
     }

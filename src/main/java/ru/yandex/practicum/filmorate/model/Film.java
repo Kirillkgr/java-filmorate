@@ -68,11 +68,7 @@ public class Film {
 
     Set<Integer> likesIds;
 
-    public Film(int newId, @NotNull @NotBlank String name,
-                @NotNull @Size(min = 1, max = 200) String description,
-                @NotNull @PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.") LocalDate releaseDate,
-                Duration duration,
-                LinkedHashSet<GenreModel> genre) {
+    public Film(int newId, @NotNull @NotBlank String name, @NotNull @Size(min = 1, max = 200) String description, @NotNull @PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.") LocalDate releaseDate, Duration duration, LinkedHashSet<GenreModel> genre) {
         this.id = newId;
         this.name = name;
         this.description = description;

@@ -98,10 +98,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User with ID " + parentId + " not found"));
         }
         List<FriendDTO> friends = userStorage.getFriends(parentId);
-        List<User> friendsUser = friends.stream()
-                .map(friend -> userStorage.getUser(friend.getId()))
-                .collect(Collectors.toList());
-
+        List<User> friendsUser = friends.stream().map(friend -> userStorage.getUser(friend.getId())).collect(Collectors.toList());
 
         return ResponseEntity.ok(friendsUser);
     }

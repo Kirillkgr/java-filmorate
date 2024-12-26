@@ -26,8 +26,7 @@ public class GenreController {
     @GetMapping("/genres/{id}")
     public ResponseEntity<Genre> getByIdGenre(@PathVariable Integer id) {
         Genre actualGenre = genresRepository.getGenre(id);
-        if (actualGenre == null)
-            return ResponseEntity.notFound().build();
+        if (actualGenre == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(actualGenre);
     }
 }
