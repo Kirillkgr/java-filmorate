@@ -43,8 +43,7 @@ public class UserDbStorage implements UserStorage {
     public User updateUser(User updateUser) {
         if (!existsById(updateUser.getId())) return null;
         String sql = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? WHERE id = ?";
-        jdbcTemplate.update(sql, updateUser.getName(), updateUser.getEmail(), updateUser.getLogin(),
-                updateUser.getBirthday(), updateUser.getId());
+        jdbcTemplate.update(sql, updateUser.getName(), updateUser.getEmail(), updateUser.getLogin(), updateUser.getBirthday(), updateUser.getId());
         return getUser(updateUser.getId());
     }
 
@@ -68,12 +67,16 @@ public class UserDbStorage implements UserStorage {
     public boolean addFriend(Integer id, Integer friendId) {
         // Проверяем, существует ли запись о дружбе между user_id и friend_id
         String checkSql = "SELECT status FROM friendship WHERE user_id = ? AND friend_id = ?";
-        List<String> statusList = jdbcTemplate.query(checkSql, (rs, rowNum) -> rs.getString("status"), id, friendId);
+        List<String> statusListUser = jdbcTemplate.query(checkSql, (rs, rowNum) -> rs.getString("status"), id, friendId);
 
         // Проверяем, существует ли обратная запись о дружбе
         List<String> reverseStatusList = jdbcTemplate.query(checkSql, (rs, rowNum) -> rs.getString("status"), friendId, id);
 
-        if (statusList.isEmpty()) {
+        // Логирование для отладки
+        System.out.println("Status list for user_id=" + id + " and friend_id=" + friendId + ": " + statusListUser);
+        System.out.println("Reverse status list for user_id=" + friendId + " and friend_id=" + id + ": " + reverseStatusList);
+
+        if (statusListUser.isEmpty()) {
             // Вставляем новую запись со статусом "pending"
             String insertSql = "INSERT INTO friendship (user_id, friend_id, status) VALUES (?, ?, 'pending')";
             jdbcTemplate.update(insertSql, id, friendId);
@@ -82,11 +85,11 @@ public class UserDbStorage implements UserStorage {
 
         if (reverseStatusList.contains("pending")) {
             // Обновляем обе записи на "accepted" при взаимном добавлении
-            String updateSql = "UPDATE friendship SET status = 'accepted' WHERE (user_id = ? AND friend_id = ?) OR (friend_id = ? AND user_id = ?)";
-            jdbcTemplate.update(updateSql, id, friendId, friendId, id);
+            String updateSql = "UPDATE friendship SET status = 'accepted' WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
+            int updatedRows = jdbcTemplate.update(updateSql, id, friendId, friendId, id);
+            System.out.println("Number of rows updated: " + updatedRows);
             System.out.println("Friendship accepted: userId=" + id + ", friendId=" + friendId);
         }
-        acceptFriendship(id, friendId);
         return true;
     }
 
@@ -152,9 +155,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<FriendDTO> getFriends(Integer id) {
-        String sql = "SELECT u.id, u.name, f.status FROM users u " +
-                "JOIN friendship f ON u.id = f.friend_id " +
-                "WHERE f.user_id = ? AND f.status = 'pending'";
+        String sql = "SELECT u.id, u.name, f.status FROM users u " + "JOIN friendship f ON u.id = f.friend_id " + "WHERE f.user_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             FriendDTO friendDTO = new FriendDTO();
             friendDTO.setId(rs.getInt("id"));
@@ -172,23 +173,19 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<FriendDTO> getCommonFriends(Integer id, Integer otherId) {
-        String sql = "SELECT u.id, u.name FROM users u " +
-                "JOIN friendship f1 ON u.id = f1.friend_id " +
-                "JOIN friendship f2 ON u.id = f2.friend_id " +
-                "WHERE f1.user_id = ? AND f2.user_id = ? AND f1.status = 'accepted' AND f2.status = 'accepted'";
-        List<FriendDTO> commonFriends = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            FriendDTO friendDTO = new FriendDTO();
-            friendDTO.setId(rs.getInt("id"));
-            friendDTO.setName(rs.getString("name"));
-            return friendDTO;
-        }, id, otherId);
-
-        // Логирование
-        System.out.println("Common friends for userId=" + id + " and otherId=" + otherId + ": " + commonFriends);
-
-        return commonFriends;
+        String sql = """
+                    SELECT DISTINCT u.id, u.name
+                    FROM users u
+                    JOIN friendship f1 ON u.id = f1.friend_id
+                    JOIN friendship f2 ON u.id = f2.friend_id
+                    WHERE f1.user_id = ? AND f2.user_id = ?
+                """;
+        return jdbcTemplate.query(sql, this::mapRowToFriendDTO, id, otherId);
     }
 
+    private FriendDTO mapRowToFriendDTO(ResultSet rs, int rowNum) throws SQLException {
+        return new FriendDTO(rs.getInt("id"), rs.getString("name"), "");
+    }
 
     @Override
     public boolean existsById(Integer id) {
