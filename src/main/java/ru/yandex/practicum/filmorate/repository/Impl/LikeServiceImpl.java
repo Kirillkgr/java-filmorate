@@ -18,9 +18,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LikeServiceImpl implements LikeRepository {
 
-
     JdbcTemplate jdbcTemplate;
-
 
     @Override
     public boolean existsById(Integer id) {

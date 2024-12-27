@@ -76,7 +76,6 @@ public class FilmController {
         return ResponseEntity.ok(newFilm);
     }
 
-    // new
     @PutMapping(value = "/{filmId}/like/{userId}")
     public ResponseEntity<?> addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         Film film = filmStorage.addLike(filmId, userId);

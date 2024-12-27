@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,7 +24,6 @@ import ru.yandex.practicum.filmorate.Enums.Genre;
 @RequiredArgsConstructor
 public class GenreModel {
 
-    @Valid
     @NotNull
     Integer id;
 

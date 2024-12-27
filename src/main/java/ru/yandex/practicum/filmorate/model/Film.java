@@ -50,7 +50,6 @@ public class Film {
 
     @NotNull
     @PastOrPresent(message = "Дата выхода должна быть в прошлом или настоящем.")
-    @AssertTrue(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
     @EqualsAndHashCode.Exclude
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
