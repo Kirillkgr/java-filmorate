@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -10,13 +7,17 @@ import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.DTO.FilmDto;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
-
-import java.util.List;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class FilmControllerTest {
 
@@ -54,7 +55,7 @@ class FilmControllerTest {
 
 		filmController.createFilm(testFilm);
 
-		ResponseEntity<Film> response = filmController.getFilm(1);
+		ResponseEntity<FilmDto> response = filmController.getFilm(1);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(testFilm.getName(), response.getBody().getName());
@@ -62,7 +63,7 @@ class FilmControllerTest {
 
 	@Test
 	void getFilm_nonExistingFilm_returnsNotFound() {
-		ResponseEntity<Film> response = filmController.getFilm(1);
+		ResponseEntity<FilmDto> response = filmController.getFilm(1);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull(response.getBody());
 	}
@@ -75,7 +76,7 @@ class FilmControllerTest {
 		ResponseEntity<FilmDto> response = filmController.updateFilm(testFilm);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 
-		ResponseEntity<Film> getFilmResponse = filmController.getFilm(1);
+		ResponseEntity<FilmDto> getFilmResponse = filmController.getFilm(1);
 		assertEquals("Updated Film", Objects.requireNonNull(getFilmResponse.getBody()).getName());
 	}
 
